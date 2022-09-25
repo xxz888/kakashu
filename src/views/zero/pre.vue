@@ -74,7 +74,7 @@ export default {
 .pre_bg_t {
   height: 150px;
   width: 100%;
-  background: url("../../assets/zero/pre_bg_t.png") center no-repeat;
+  background: #9B3C9D;
   background-size: 100% 100%;
 }
 

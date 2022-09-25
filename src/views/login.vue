@@ -53,6 +53,15 @@
             </div>
           </div>
 
+
+       <div class=" mt-20 theme_border_radius">
+            <div class="">
+              <van-field  class="tfClass" v-model="regPwd1" clearable type="password" placeholder="请再次输入密码">
+              </van-field>
+            </div>
+          </div>
+
+
           <div class=" mt-20 theme_border_radius">
             <div class="">
               <van-field class="tfClass" v-model="preUserPhone" clearable type="number" maxlength="11" placeholder="推荐人手机号">
@@ -83,7 +92,7 @@
 
       <p class="forget"><span @click="forget">忘记密码?</span></p>
       <div v-if="!active" class="login_tips" @click="pull">
-        登录即代表已同意 <span>《卡卡鼠服务协议》</span>
+        登录即代表已同意 <span>《咔咔鼠服务协议》</span>
       </div>
     </div>
   </div>
@@ -107,7 +116,8 @@ export default {
       num: 60,
       message: "发送验证码",
       preUserPhone: '',
-      regPwd: ''
+      regPwd: '',
+      regPwd1:''
     };
   },
   components: {
@@ -169,6 +179,10 @@ export default {
         return;
       }
       
+      if (this.regPwd != this.regPwd1) {
+          this.$toast({message: "两次密码输入不一致", position: "bottom"});
+        return;
+      }
       if (this.preUserPhone == '') {
         this.$toast({message: "推荐人手机号码有误,请重填", position: "bottom"});
         return;

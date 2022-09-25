@@ -146,7 +146,7 @@
               <p>平级管理奖</p>
             </li> -->
 
-            <li class="item" @click="next('profitUser', 1)">
+            <li class="item" @click="next('profitType2', 1,'直推激活奖')">
               <img
                 class="img60"
                 src="../../assets/profit/组 17849@2x.png"

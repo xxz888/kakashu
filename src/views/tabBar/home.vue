@@ -8,7 +8,7 @@
       <div class="home_header_item" @click="meiqia">
         <div class="home_header_right">
           <span v-show="$store.state.user.unread" class="dot">{{ $store.state.user.unread }}</span>
-          <img src="@/assets/home/information.png" alt="">
+          <img src="@/assets/home/分组@2x.png" alt="">
         </div>
       </div>
     </div>
@@ -132,10 +132,10 @@
             <div @click="$router.push('/library')" class="skip_item">
         
             </div>
-            <div @click="$router.push('/partnerBusiness')" class="skip_material">
+            <div @click="kongkaClick" class="skip_material">
        
             </div>
-            <div @click="$router.push('/news')" class="skip_news">
+            <div @click="kongkaClick" class="skip_news">
        
             </div>
           </div>
@@ -539,7 +539,6 @@ export default {
   align-items: center;
   font-size: 11px;
   padding-top: 5px;
-  width: 55px;
 }
 
 .home_header_title {
