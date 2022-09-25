@@ -329,6 +329,7 @@ export default {
   components: {
     [NavBar.name]: NavBar,
   },
+  mounted() {},
   methods: {
     onClickLeft() {
       window.history.back()
@@ -336,7 +337,7 @@ export default {
       this.$router.push({name: 'register'})
     },
   }
-}
+};
 </script>
 <style scoped>
 .pull {

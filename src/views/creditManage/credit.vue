@@ -102,6 +102,7 @@ export default {
     [Empty.name]: Empty,
     [Icon.name]: Icon
   },
+  computed: {},
   created() {
     this._newsQuery()
     this._userQuotaQuery()
@@ -136,7 +137,6 @@ export default {
       } else {
         this.$router.push({name: name, params: {type: JSON.stringify(type)}})
       }
-
     },
     link(item) {
       let num = 0
@@ -170,7 +170,7 @@ export default {
         this._userQuotaQuery()
         this.isLoading = false;
       }, 1000);
-    },
+    }
   }
 }
 </script>
@@ -243,7 +243,7 @@ export default {
 }
 
 .credit_sum_amount div > span {
-  color: #F63802;
+  color: #9B3C9D;
 }
 
 .credit_btn {
@@ -264,7 +264,7 @@ export default {
 }
 
 .credit_btn.active {
-  background: 4cc566;
+  background: #9B3C9D;
 }
 
 .credit_son_box {

@@ -2,6 +2,7 @@
   <div>
     <!-- 还款计划账单提示 -->
     <van-overlay :show="planBillTipsTrueFalseBy" @click="planBillTipsTrueFalseBy=false"/>
+
     <div class="plan_bill_tips_box" v-if="planBillTipsTrueFalseBy">
       <div class="plan_bill_tips_title  ">
         账单详细
@@ -63,7 +64,8 @@
                 Number(task.allServiceCharge) - Number(task.afterUpGradeTotalCharge.afterUpGradeTotalServiceCharge) |toFixed
               }}元,全年省{{
                 (Number(task.allServiceCharge) - Number(task.afterUpGradeTotalCharge.afterUpGradeTotalServiceCharge)) * 12 |toFixed
-              }}元)
+              }}元
+              )
             </div>
           </li>
           <li class="van-hairline--bottom ">
@@ -131,11 +133,24 @@ import {
   Dialog,
   Overlay
 } from "vant";
+import {paypassAuth} from '@/api/user'
 
 export default {
   props: {
     task: Object,
-    extra: Object
+    extra: Object,
+    number: {
+      type: String,
+      default: ''
+    },
+    addressId: {
+      type: String,
+      default: ''
+    },
+    type: {
+      type: String,
+      default: ''
+    }
   },
   data() {
     return {
@@ -157,7 +172,7 @@ export default {
   methods: {
     submitPlan() {
       this.$emit("isPassword");
-    }
+    },
   }
 };
 </script>

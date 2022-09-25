@@ -45,9 +45,8 @@
           </van-col>
         </van-row>
         <div style="color:#999;font-size:13px;line-height:20px;">
-          <p>费率：0.88%（每1万元88元手续费）+2元/次</p>
-          <p>您是 <span style="color:red">{{ level.levelName }}</span> 用户，每1万元可以返 <span
-            style="color:red">{{ handleAmount() }} </span> 元</p>
+          <p>费率：0.85%（每1万元85元手续费）+3元/次</p>
+    
         </div>
       </div>
     </div>
@@ -163,7 +162,7 @@ export default {
   created() {
     this.userId = localStorage.getItem('userId')
     this.phone = localStorage.getItem('phone')
-    this.getLevelPage()
+    // this.getLevelPage()
     // this.getCard(0, 0, 1)
     this.getCard(2, 2, 1)
     this._newsQuery()
@@ -274,6 +273,7 @@ export default {
         this.$toast({message: '请先选择地区', position: 'bottom'})
         return
       }
+      debugger
       huabeiPayApi({
         idCard: this.defJieCardList[0].idcard,
         debitPhone: this.defJieCardList[0].phone,
@@ -282,7 +282,14 @@ export default {
         securityCode: this.fenqi,
         channelTag: this.channelTag,
         cityCode: this.cityCode,
-        amount: this.money
+        amount: this.money,
+
+      
+        bankCard:this.defJieCardList[0].cardNo,
+        bankPhone:this.defJieCardList[0].phone,
+        expiredTime:'0722',
+
+
       }).then(res => {
         if (res.resp_code == '000000') {
           // window.open(res.result.pay_url)
@@ -291,6 +298,16 @@ export default {
           this.$toast({message: res.resp_message, position: 'bottom'})
         }
       })
+      /**
+       * 
+       * {"status":"SUCCESS",
+       * "orderNumber":"K2207220959563965",
+       * "subOrderNumber":"20220722869508141056000",
+       * "responseMsg":"业务受理成功，等待用户确认",
+       * "payUrl":"https://qr.alipay.com/bax02878of60cfrcmswv30de"}
+       * 
+       * 
+       */
       // getchannelBybankcard(this.userId, this.defDaiCardList[0].cardNo, this.money, this.brandId, recommend).then(res => {
       //   if (res.resp_code == '000000') {
       //     this.channel = res.result
@@ -594,7 +611,7 @@ export default {
 }
 
 .online_keyboard >>> .van-key--blue {
-  background: #3AC461;
+  background: #9B3C9D;
 }
 
 .money_input >>> .van-field__control::-webkit-input-placeholder {

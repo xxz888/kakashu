@@ -8,36 +8,25 @@
           <van-field v-model="authorityList.result.userName" label="持卡人" readonly="readonly"/>
           <van-field v-model="cardNo" label="卡号" placeholder="请输入信用卡号" clearable minlength="10"
                      readonly="readonly"></van-field>
-
           <van-field v-model="authorityList.result.securityCode" label="安全码" maxlength="3" readonly="readonly"
                      placeholder="请输入(卡背面CVN2后三位数字)" clearable>
-            <!-- <van-icon name="question" slot="right-icon"  @click="codeTrueFalseBy=true" /> -->
           </van-field>
           <van-field v-model="authorityList.result.expiredTime" label="有效期" maxlength="4" readonly="readonly"
                      placeholder="请输入(如09/22输入0922)" clearable/>
           <van-field v-model="authorityList.result.phone" label="手机号" placeholder="请输入银行卡预留手机号" readonly="readonly"
                      clearable maxlength="11">
-            <!-- <van-icon name="question" slot="right-icon"  @click="phoneTrueFalseBy=true"    /> -->
           </van-field>
-          <van-field
-            v-model="smsCode"
-            center
-            clearable
-            label="短信验证码"
-            placeholder="请输入短信验证码"
-          >
+          <van-field v-model="smsCode" center clearable label="短信验证码" placeholder="请输入短信验证码">
             <template #button>
               <van-button size="small" plain type="danger" @click="getCode()">{{ message }}</van-button>
             </template>
           </van-field>
         </div>
       </div>
-
       <div class=" upcreditcard_btn_box">
         <van-button @click.native="confirm()" type="primary" class=" upcreditcard_btn  " round>确认</van-button>
       </div>
     </div>
-
   </div>
 </template>
 <script>
@@ -61,7 +50,6 @@ export default {
       message: '获取验证码',
       orderCode: "",
       channelactive: {},
-
       authorityList: {
         result: {
           bankCard: "",
@@ -83,7 +71,6 @@ export default {
     [Button.name]: Button,
     [Icon.name]: Icon
   },
-  computed: {},
   created() {
     this.authorityList = JSON.parse(this.$route.params.authorityList)
     this.item = JSON.parse(this.$route.params.item)
@@ -182,6 +169,7 @@ export default {
         this.$store.commit('closeLoading')
         if (response.resp_code == '000000') {
           creditcardmanagerverify(this.userId, this.item.creditCardNumber, this.item.version).then(res => {
+            this.publicJs.output(res, "验证用户是否需要绑卡接口")
             if (res.resp_code == '000000') {
               this.confirmPlan()
             } else {
@@ -197,7 +185,8 @@ export default {
       saveEmptyCard(this.userId, this.item.creditCardNumber).then(res => {
         this.$store.commit('closeLoading')
         if (res.resp_code == "000000") {
-          this.$router.push({path: "/zero",
+          this.$router.push({
+            path: "/zero",
             query: {
               'phone': localStorage.getItem('phone'),
               'token': localStorage.getItem('token'),
@@ -215,7 +204,7 @@ export default {
       })
     }
   }
-};
+}
 </script>
 <style scoped>
 .upcreditcard_title {

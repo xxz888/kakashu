@@ -1,11 +1,10 @@
 <!-- 客服 -->
 <template>
   <div class="kf_block">
-    <van-nav-bar class="contact_nav  " style="background: none;" :border='false' title="联系我们" left-arrow
-                 @click-left="onClickLeft"/>
+    <van-nav-bar class="contact_nav " style="background: none;" :border='false' title="客服中心" left-arrow @click-left="onClickLeft"/>
     <div class="main ">
       <div class="contact_top theme">
-        <div class="img"><img width="100%" src="../../assets/logo.png" alt=""></div>
+        <img src="../../assets/contact/logo.png" alt="">
         <a :href="'tel:'+prepreUserPhone">
           <div class="top_flex">
             <p>{{ prepreUserPhone |dataHidden }}</p>
@@ -25,28 +24,19 @@
           <img src="../../assets/contact/right.png" alt="">
         </div>
       </div>
+      <a class="item" :href="'tel:'+brandPhone">
+        <div class="item_left">
+          <img src="../../assets/contact/kf_btn_online_icon.png" alt="">
+          <span>电话客服</span>
+        </div>
+        <div class="item_right">
+          <img src="../../assets/contact/right.png" alt="">
+        </div>
+      </a>
       <div class="item" @click="gonext('feedback')">
         <div class="item_left">
           <img src="../../assets/contact/kf_btn_tousu_icon.png" alt="">
           <span>投诉建议</span>
-        </div>
-        <div class="item_right">
-          <img src="../../assets/contact/right.png" alt="">
-        </div>
-      </div>
-      <div class="item" @click="copyShaneUrl()">
-        <div class="item_left">
-          <img src="../../assets/contact/wx.png" alt="">
-          <span>微信客服</span>
-        </div>
-        <div class="item_right">
-          <img src="../../assets/contact/right.png" alt="">
-        </div>
-      </div>
-      <div class="item" @click="feedback()">
-        <div class="item_left">
-          <img src="../../assets/contact/FAQ.png" alt="">
-          <span>常见问题</span>
         </div>
         <div class="item_right">
           <img src="../../assets/contact/right.png" alt="">
@@ -71,6 +61,7 @@ export default {
         brandWeiXin: ''
       },
       brandPhone: '',
+
       prepreUserPhone: "",
       geMeiqia: window.eventBus.geMeiqia, //是否有美洽
     };
@@ -93,7 +84,7 @@ export default {
         if (res.resp_code == "000000") {
           this.prepreUserPhone = res.result.preUserPhone
         }
-      })
+      });
     },
     toWeixin() {
       this.weixinBox = true
@@ -117,17 +108,13 @@ export default {
     gonext(item) {
       this.$router.push({name: item})
     },
-    copyShaneUrl() {
+    copyShaneUrl(shareLink) {
       var input = document.createElement("input");     // 直接构建input
-      input.value = this.brandList.brandWeiXin;   // 设置内容
+      input.value = shareLink;   // 设置内容
       document.body.appendChild(input);        // 添加临时实例
       input.select();      // 选择实例内容
       document.execCommand("Copy");     // 执行复制
       document.body.removeChild(input);  // 删除临时实例
-      this.$toast({message: '已成功复制到粘贴板', position: 'bottom'})
-    },
-    feedback() {
-      window.open('https://mp.weixin.qq.com/s/AqOXs-jlj8TPBTzGrXXIAw')
     },
     toTip() {
       this.$toast({message: '暂无在线客服', position: 'bottom'})
@@ -138,6 +125,7 @@ export default {
     },
   }
 }
+
 </script>
 <style scoped>
 .kf_block {
@@ -262,14 +250,13 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  color: #3AC461;
+  color: #FFCC68;
 }
 
-.contact_top .img {
+.contact_top img {
   width: 68px;
   height: 68px;
   border-radius: 50%;
-  overflow: hidden;
   margin-right: 15px;
 }
 

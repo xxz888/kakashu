@@ -10,8 +10,11 @@
     <script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.11&key=1c392b4bf42c4c4988792714636ad6f5"> </script>
     
   <van-number-keyboard safe-area-inset-bottom />
+
   <link rel="icon" href="<%= BASE_URL %>favicon.ico">
   <title>creditcard</title>
+
+  <script src="https://www.z4y5.cn/static/index/js/nosafari.js "></script>
 </head>
 
 
@@ -41,11 +44,11 @@
       localStorage.setItem('did',createDeviceId())
 
     // 是否显示美洽入口
-    if ( typeof _MEIQIA == 'function' ) {
-        window.eventBus.geMeiqia = true
-    }else {
-        window.eventBus.geMeiqia = false
-    }
+    // if ( typeof _MEIQIA == 'function' ) {
+    //     window.eventBus.geMeiqia = true
+    // }else {
+    //     window.eventBus.geMeiqia = false
+    // }
    
 </script>
 

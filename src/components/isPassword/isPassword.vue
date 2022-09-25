@@ -31,6 +31,18 @@ import {paypassAuth} from '@/api/user'
 export default {
   props: {
     productDteail: Object,
+    number: {
+      type: String,
+      default: ''
+    },
+    addressId: {
+      type: String,
+      default: ''
+    },
+    type: {
+      type: String,
+      default: ''
+    }
   },
   data() {
     return {
@@ -64,7 +76,9 @@ export default {
     onInput(key) {   //支付密码
       this.password = (this.password + key).slice(0, 6);
       if (this.password.length == 6) {
+        this.publicJs.output(this.password, "支付密码")
         paypassAuth(this.token, this.password).then(res => {
+          this.publicJs.output(res, "支付密码验证")
           if (res.resp_code == "000000") {
             this.$emit("confirmPlan");
           }

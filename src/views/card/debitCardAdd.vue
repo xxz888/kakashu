@@ -10,15 +10,14 @@
           <van-field v-if="userList.realnameStatus!=1" v-model="realname" label="持卡人" readonly/>
           <van-field v-model="item.cardNo" type="digit" label="卡号" placeholder="请输入您的信用卡号" clearable minlength="10"
                      required>
-            <van-icon name="scan" slot="right-icon" @click="scanCard()"/>
-            <!-- <van-icon name="../../assets/addcard/camera.png"
-                      slot="right-icon" @click="scanCard()"/> -->
+            <!-- <van-icon name="scan" slot="right-icon" @click="scanCard()"/> -->
+            <van-icon name="../../assets/addcard/camera.png"
+                      slot="right-icon" @click="scanCard()"/>
           </van-field>
-          <van-field v-model="item.phone" type="digit" label="手机号" placeholder="信用卡银行预留手机号" clearable maxlength="11"
+          <van-field v-model="item.phone" type="digit" label="手机号" placeholder="信用卡银行预览手机号" clearable maxlength="11"
                      required>
             <van-icon name="question" slot="right-icon" @click="phoneTrueFalseBy=true"/>
           </van-field>
-          <van-field placeholder="请输入信用卡额度" v-model="balance" label="额度"/>
         </div>
       </div>
       <div class="card_box">
@@ -45,7 +44,7 @@
         <div class="theme ">2.暂不支持借贷合一卡制定还款计划</div>
       </div>
       <div class=" upcreditcard_btn_box">
-        <van-button @click.native="update()" type="primary" class=" upcreditcard_btn" round>确认添加</van-button>
+        <van-button @click.native="update()" type="primary" class=" upcreditcard_btn  " round>确认添加</van-button>
       </div>
     </div>
     <van-popup v-model="billDayTrueFalseBy" position="bottom" :style="{ height: '40%' }">
@@ -57,7 +56,10 @@
         @cancel="billDayTrueFalseBy=false"
         @confirm="billDayConfirm"/>
     </van-popup>
-    <van-popup v-model="repaymentDayTrueFalseBy" position="bottom" :style="{ height: '40%' }">
+    <van-popup
+      v-model="repaymentDayTrueFalseBy"
+      position="bottom"
+      :style="{ height: '40%' }">
       <van-picker
         show-toolbar
         title="选择还款日"
@@ -66,7 +68,9 @@
         @cancel="repaymentDayTrueFalseBy=false"
         @confirm="repaymentDayConfirm"/>
     </van-popup>
-    <van-popup v-model="codeTrueFalseBy" round>
+    <van-popup
+      v-model="codeTrueFalseBy"
+      round>
       <div class="box">
         <div class="title">什么是CVN2后3位？</div>
         <div class="bg"></div>
@@ -85,7 +89,6 @@
         <div class="btn" @click="phoneTrueFalseBy=false">我知道了</div>
       </div>
     </van-popup>
-
     <guide step='3' @next="tian=false" v-show="tian"/>
   </div>
 </template>
@@ -119,14 +122,13 @@ export default {
         realname: "",
         idcard: ""
       },
-      balance: '',
       billDayTrueFalseBy: false,
       repaymentDayTrueFalseBy: false,
       columns: [],
       codeTrueFalseBy: false,
       phoneTrueFalseBy: false,
       tian: true,
-      empowerToken: null
+            empowerToken: null,
     };
   },
   components: {
@@ -140,16 +142,19 @@ export default {
     [Icon.name]: Icon,
     guide
   },
+  computed: {},
   created() {
-    if(this.$route.query.empowerToken){
+      if(this.$route.query.empowerToken){
       this.empowerToken = this.$route.query.empowerToken
+      this.isBackAgentView = this.$route.query.isBackAgentView
     }else {
       this.empowerToken = null
+      this.isBackAgentView = '-1'
     }
-    let date = new Date();
-    let year = date.getFullYear();
-    let month = date.getMonth() + 1;
-    let d = new Date(year, month, 0);
+    var date = new Date();
+    var year = date.getFullYear();
+    var month = date.getMonth() + 1;
+    var d = new Date(year, month, 0);
     this.columns = []
     for (let i = 1; i <= d.getDate(); i++) {
       this.columns.push(i)
@@ -158,11 +163,14 @@ export default {
   },
   methods: {
     onClickLeft() {
-      this.publicJs.back();
+           this.publicJs.back();
+    
+   
     },
     getUserInfo() {
-      let tokenTemp = this.token
-      if(this.empowerToken){
+            let tokenTemp = this.token
+
+       if(this.empowerToken){
         tokenTemp = this.empowerToken
       }
       userInfoQuery(tokenTemp).then(res => {
@@ -222,14 +230,12 @@ export default {
       }
       this.add()
     },
-    add() {
+    add() {   
       let tokenTemp = this.token
       if(this.empowerToken){
         tokenTemp = this.empowerToken
       }
-      let cardBalance = 0
-      if(this.balance) cardBalance = this.balance
-      addBank(tokenTemp, this.userList.realname, this.item.cardNo, this.userList.idcard, this.item.phone, 0, this.item.expiredTime, this.item.securityCode, this.item.billDay, this.item.repaymentDay, cardBalance).then(res => {
+      addBank(tokenTemp, this.userList.realname, this.item.cardNo, this.userList.idcard, this.item.phone.replace(/\s/g, ""), 0, this.item.expiredTime, this.item.securityCode, this.item.billDay, this.item.repaymentDay, '20000').then(res => {
         if (res.resp_code == "000000") {
           this.$notify({type: "primary", message: res.resp_message});
           window.history.go(-1)

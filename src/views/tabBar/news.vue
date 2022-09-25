@@ -1,7 +1,8 @@
 <template>
   <div class="new">
     <!-- 头部导航 -->
-    <van-nav-bar left-arrow fixed :border='false' @click-left="onClickLeft" title="资讯" />
+    <van-nav-bar title="资讯" left-arrow fixed @click-left="onClickLeft"></van-nav-bar>
+     
     <div class="warpper_top"></div>
     <van-pull-refresh v-model="isLoading" @refresh="onRefresh" loading-text="加载中...">
       <div>
@@ -17,7 +18,8 @@
         </ul>
       </div>
     </van-pull-refresh>
-    <div class="tabbar_p"></div>
+    <!-- <div class="tabbar_p"></div>
+    <tabbar></tabbar> -->
   </div>
 </template>
 
@@ -26,9 +28,11 @@ import {
   NavBar,
   PullRefresh
 } from 'vant';
+import tabbar from '@/components/tabbar'
 import {
   newsQuery
 } from '@/api/showBrand'
+import request from "@/utils/request";
 
 export default {
   data() {
@@ -40,13 +44,15 @@ export default {
   components: {
     [NavBar.name]: NavBar,
     [PullRefresh.name]: PullRefresh,
+    
   },
   created() {
     this._newsQuery()
   },
   methods: {
-    onClickLeft() {
-      this.publicJs.back()
+        onClickLeft() {
+      window.history.back()
+      return
     },
     // 获取资讯
     _newsQuery(type) {
@@ -69,7 +75,7 @@ export default {
         this.$toast('刷新成功');
         this.isLoading = false;
       }, 1000);
-    }
+    },
   }
 };
 

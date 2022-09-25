@@ -1,204 +1,179 @@
 <template>
   <div>
-    <van-nav-bar class="contact_nav " :border='false' title="消息中心" left-arrow @click-left="onClickLeft"/>
-    <div class="tabs">
-      <van-tabs v-model="active" color="#3AC461" line-width="50%" line-height="2px" @change="tab">
-        <van-tab title="个人消息"></van-tab>
-        <van-tab title="小八通知"></van-tab>
-        <van-tab :dot='$store.state.user.unread!=0' title="在线客服"></van-tab>
-      </van-tabs>
-    </div>
+    <van-nav-bar
+      class="contact_nav"
+      :border="false"
+      title="客服中心"
+      left-arrow
+      @click-left="onClickLeft"
+    />
     <div class="main">
-      <van-list v-model="loading" :finished="finished" finished-text="" @load="onLoad">
-        <div class="list" v-show="active!=2">
-          <div class="item" v-for="(item,i) in list" :key="i">
-            <div><img width="100px" src="../../assets/contact/tit_logo.png"> <span>{{ item.createTime }}</span></div>
-            <p>{{ item.content }}</p>
-          </div>
+      <div class="item">
+        <h4 class="kefu">直接推荐人</h4>
+        <a :href="'tel:' + prepreUserPhone">
+          <p class="teler zi">
+            手机号：{{ prepreUserPhone | dataHidden }}
+            <img
+              class="tel"
+              src="../../assets/contact/phone_btn_online_icon.png"
+              alt=""
+            />
+          </p>
+          <p class="zi">
+            直接推荐人是使用咔咔鼠的直接引导人,他可以为您提供咔咔鼠功能使用说明，推广引导等服务。
+          </p>
+        </a>
+      </div>
+      <div class="item online" @click="meiqia">
+        <p class="online">
+          <van-icon
+            name="chat-o"
+            size="20px"
+            :dot="$store.state.user.unread != 0"
+          />
+          在线客服
+        </p>
+        <p class="zi">
+          服务时间：每天9:00-21:00
+          <van-tag type="warning">&nbsp;点击进入&nbsp;</van-tag>
+        </p>
+      </div>
+      <div class="item">
+        <div>
+          <span class="kefu">微信客服：</span>
         </div>
-        <div class="list" @click="meiqia()" v-show="active==2">
-          <div class="item">
-            <div><img width="100px" src="../../assets/contact/tit_logo.png"></div>
-            <p>八色客服</p>
-          </div>
+        <p class="zi pp" style="margin-top:15px">
+          客服小贝:card-time
+          <span @click="copyShaneWxServe('card-time')" style="color: red"
+            >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;复制微信号</span
+          >
+        </p>
+        <p class="zi pp">
+          客服小淇:cardtime01
+          <span @click="copyShaneWxServe('cardtime01')" style="color: red"
+            >&nbsp;&nbsp;&nbsp;&nbsp;复制微信号</span
+          >
+        </p>
+        <p class="zi pp">
+          客服小琪:cardtime02
+          <span @click="copyShaneWxServe('cardtime02')" style="color: red"
+            >&nbsp;&nbsp;&nbsp;&nbsp;复制微信号</span
+          >
+        </p>
+      </div>
+
+
+
+      <div class="item" >
+        <div>
+          <h4 class="kefu">官方统一热线：</h4>
+          <a :href="'tel:' + '4008877555'">
+            <p class="teler zi">
+              电话：4008877555
+              <img
+                class="tel"
+                src="../../assets/contact/phone_btn_online_icon.png"
+                alt=""
+              />
+            </p>
+          </a>
         </div>
-      </van-list>
+      </div>
+      <div class="item">
+        <div class="liu" @click="leave()">
+          <span class="kefu">客服留言: </span>
+          <span><van-badge :content="num" v-show="num" /></span>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 <script>
-import {NavBar, Icon, Tag, Badge, Tab, Tabs, List} from 'vant'
-import {brandQuery} from '@/api/showBrand'
-import {userJpushHistory} from '@/api/user'
-import {getBrandNews} from '@/api/showBrand'
-import {preUserQuery} from "@/api/user";
+import { NavBar, Icon, Tag, Badge } from "vant";
+import { brandQuery } from "@/api/showBrand";
+import { preUserQuery } from "@/api/user";
 
 export default {
   data() {
     return {
-      prepreUserPhone: '',
-      brandPhone: '',
-      num: '',
-      active: 0,
-      token: localStorage.getItem('token'),
-      type: 1, // 类型 0平台消息，1个人消息
-      sizebrand: 20,
-      size: 20,
-      list: [],
-      loading: false,
-      finished: false,
-    }
+      prepreUserPhone: "13336816566",
+      brandPhone: "13336816566",
+      num: "",
+    };
   },
   components: {
     [NavBar.name]: NavBar,
     [Icon.name]: Icon,
     [Tag.name]: Tag,
     [Badge.name]: Badge,
-    [Tab.name]: Tab,
-    [Tabs.name]: Tabs,
-    [List.name]: List
   },
   created() {
-    this.num = this.$route.params.num
-    this.getBrand()
-    this.getUserPush()
+    this.num = this.$route.params.num;
+    this._preUserQuery();
+    this.getBrand();
   },
   methods: {
+
+    copyShaneWxServe(phone) {
+      var input = document.createElement("input"); // 直接构建input
+      input.value = phone; // 设置内容
+      document.body.appendChild(input); // 添加临时实例
+      input.select(); // 选择实例内容
+      document.execCommand("Copy"); // 执行复制
+      document.body.removeChild(input); // 删除临时实例
+      this.$toast({ message:"微信号"+phone+ "已成功复制到粘贴板", position: "bottom" });
+      window.location.href = "weixin://";
+
+    },
     meiqia() {
-      _MEIQIA('init')
-      _MEIQIA('showPanel')
+      _MEIQIA("init");
+      _MEIQIA("showPanel");
+    },
+    leave() {
+      this.$router.push({ name: "leave" });
     },
     getBrand() {
-      brandQuery(this.global.brandId).then(res => {
+      brandQuery(this.global.brandId).then((res) => {
         if (res.resp_code == "000000") {
-          this.brandList = res.result
-          this.brandPhone = res.result.brandPhone
+          this.brandList = res.result;
+          this.brandPhone = res.result.brandPhone;
         } else {
-          this.$toast({message: res.data.resp_message, position: 'bottom'})
+          this.$toast({ message: res.data.resp_message, position: "bottom" });
         }
-      })
+      });
     },
-    // 标签切换
-    tab(item) {
-      this.type = item
-      if (item == 0) {
-        this.getUserPush()
-        return
-      } else if (item == 1) {
-        this.getBrandPush()
-        return
-      } else if (item == 2) {
-        this.meiqia()
-        return
-      }
-    },
-    onLoad() {
-      // 异步更新数据
-      setTimeout(() => {
-        if (this.type == 0) {
-          this.sizebrand += 10
-          this.getBrandPush()
-          if (this.totalElementsBrand <= this.sizebrand) {
-            this.finished = true;
+    _preUserQuery() {
+      preUserQuery(this.global.brandId, localStorage.getItem("phone")).then(
+        (res) => {
+          if (res.resp_code == "000000") {
+            this.prepreUserPhone = res.result.preUserPhone;
           }
-          return
-        } else if (this.type == 1) {
-          this.size += 10
-          this.getUserPush()
-          if (this.totalElements <= this.size) {
-            this.finished = true
-          }
-          return
         }
-        this.loading = false;
-      }, 1000);
-    },
-    // 获取平台消息
-    getBrandPush() {
-      getBrandNews(this.token, this.sizebrand)
-        .then(res => {
-          if (res.resp_code == "000000") {
-            this.list = res.result.content
-            this.totalElementsBrand = res.result.totalElements
-          } else {
-            this.$toast({message: res.resp_message, position: 'bottom'})
-          }
-        })
-    },
-
-    // 获取个人消息
-    getUserPush() {
-      userJpushHistory(this.token, this.size)
-        .then(res => {
-          if (res.resp_code == "000000") {
-            this.list = res.result.content
-            this.totalElements = res.result.totalElements
-          } else {
-            this.$toast({message: res.resp_message, position: 'bottom'})
-          }
-        })
+      );
     },
     onClickLeft() {
-      window.history.back()
-
+      window.history.back();
+      return;
     },
-
-  }
-
-}
+  },
+};
 </script>
 <style scoped>
->>> .van-tag--warning {
+.van-tag--warning {
   padding: 2px;
   position: absolute;
-  width: 60px;
   bottom: 3px;
   right: -15px;
-  text-align: center;
   font-size: 11px;
-  background-color: #3AC461;
-}
-
-.tabs {
-  padding-top: 45px;
-  position: fixed;
-  width: 100%;
-}
-
-.list {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding-top: 30px;
-}
-
-.item {
-  width: 340px;
-  background: rgba(250, 255, 255, 0.8);
-  border-radius: 8px;
-  margin-bottom: 8px;
-  box-sizing: border-box;
-  color: #333;
-  font-size: 12px;
-  padding: 10px;
-  margin: 20px auto;
-  font-size: 15px;
-  border-radius: 5px;
-}
-
-.item p {
-  text-align: left;
-  color: #333;
-  font-size: 13px;
-  margin: 5px 0;
+  background-color: #9B3C9D;
 }
 
 .online {
-  color: #3AC461;
+  color: #000;
   text-align: center;
-  font-weight: 600;
+  font-weight: 400;
   vertical-align: middle;
-  font-size: 20px;
+  font-size: 15px;
 }
 
 .kefu {
@@ -206,6 +181,14 @@ export default {
   font-weight: 600;
   margin-right: 5px;
   color: #000;
+}
+
+.item {
+  padding: 15px;
+  margin: 20px auto;
+  box-shadow: 0px 1px 15px 1px #e7e7e7;
+  font-size: 15px;
+  border-radius: 5px;
 }
 
 .tel {
@@ -219,42 +202,35 @@ export default {
 .zi {
   position: relative;
   color: rgb(123, 123, 123);
-  font-size: 13px;
+  font-size: 14px;
   margin-top: 5px;
   font-weight: 400;
 }
 
 .item img {
-  margin: 10px 50px 10px 0px;
-  vertical-align: middle;
+  width: 22px;
+}
+.item .pp {
+  height: 35px;
 }
 
 .main {
-  padding: 60px 25px 0px 20px;
-  /* background: url('../../assets/contact/kf_bg.png') no-repeat ; */
-  background: linear-gradient(180deg, #3AC461 0%, #3AC461 100%) !important;
-  background-size: 100% 100%;
+  padding: 60px 25px 0px 25px;
+  background-color: #fff;
   height: 100vh;
-  overflow: scroll;
 }
 
 >>> .contact_nav {
-  background: linear-gradient(180deg, #3AC461 0%, #3AC461 100%) !important;
-
+  background: linear-gradient(180deg, #9B3C9D 0%, #9B3C9D 100%) !important;
 }
 
->>> .van-nav-bar__title, >>> .van-nav-bar__arrow {
+>>> .van-nav-bar__title,
+>>> .van-nav-bar__arrow {
   color: #fff;
 }
 
 .liu {
   display: flex;
   justify-content: space-between;
-}
-
-.tabs {
-  padding-top: 45px;
-  position: fixed;
-  width: 100%;
 }
 </style>

@@ -17,7 +17,6 @@
             </div>
           </div>
         </li>
-
         <li class="item theme_border_b">
           <span class="theme">验证码</span>
           <div class="input">
@@ -35,7 +34,6 @@
             </div>
           </div>
         </li>
-
         <li class="item theme_border_b" v-show="preUser">
           <span class="theme">推荐人手机号</span>
           <div class="input">
@@ -79,11 +77,11 @@ export default {
   created() {
     this.phone = Cookies.get("kd_l_phone");
     let did = localStorage.getItem('did')
-
-    localStorage.clear()
+    localStorage.clear();
     if (did) {
       localStorage.setItem('did', did)
     }
+      Cookies.remove('token');
     this.phone = null
   },
   methods: {
@@ -144,7 +142,6 @@ export default {
         this.$toast({message: "请先获取输入验证码", position: "bottom"});
         return;
       }
-      //
       if (this.publicJs.isPhoneNumber(this.preUserPhone)) {
         this.$toast({message: "推荐人手机号码有误,请重填", position: "bottom"});
         return;
@@ -159,7 +156,7 @@ export default {
       })
     }
   }
-}
+};
 </script>
 <style scoped>
 
@@ -190,7 +187,7 @@ export default {
 }
 
 .top {
-  background: #4cc566;
+  background: url("../assets/login/img_register_bg.jpg") center no-repeat;
   background-size: 100% 100%;
   height: 242px;
   width: 100%;
@@ -224,7 +221,7 @@ export default {
 }
 
 .sms {
-  color: #4cc566;
+  color: #9B3C9D;
 }
 
 .cont .item .left > img {

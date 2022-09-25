@@ -10,8 +10,7 @@
                 <div class="card_icon_box">
                   <img
                     class="card_icon"
-                    :src="require('../../assets/bankIcon/BANK_'+item.logimg+'.png')"
-                  />
+                    :src="require('../../assets/bankIcon/BANK_'+item.logimg+'.png')"/>
                 </div>
               </van-col>
               <van-col span="20" class="card_bank">
@@ -27,7 +26,6 @@
             </van-row>
           </div>
         </div>
-
         <div class="submit_plan_dec_box">
           <van-row type="flex">
             <van-col class="submit_plan_dec" span="12">
@@ -125,7 +123,6 @@
       <van-picker show-toolbar title="落地商户" @cancel="showPicker = false" :columns="columns"
                   @confirm="consumeTypeConfirm" @change="onChange" :default-index="defConsumeType"/>
     </van-popup>
-    <!-- <city  ref="verificationMethod" :card="item"  :extraList="task"   v-on:merchant="merchant"   ></city> -->
     <is-password ref="isPassword" v-on:confirmPlan="confirmPlan"></is-password>
     <plan-bill-tips ref="planBillTips" :task="task" :extra="extra" v-on:isPassword="isPassword"></plan-bill-tips>
     <confirmorcancel ref="endPlan" src='../../assets/alert.png' but='1'
@@ -139,10 +136,12 @@
 
 <script>
 import {NavBar, Row, Col, Icon, Popup, Picker} from 'vant';
+
 import confirmorcancel from '@/components/confirm/alert'
 import {creditcardmanagerverify} from "@/api/zero";
 import isPassword from "@/components/isPassword/isPassword"
 import planBillTips from "@/components/planBillTips/planBillTips"  //还款计划账单提示
+import {queryMerchant} from "@/api/city/city";
 import {saveEmptyCard} from "@/api/plan/plan";
 import {stopOrder, reRunOrder, checkOrder, causeMessage} from "@/api/zero";
 
@@ -192,7 +191,6 @@ export default {
     [Popup.name]: Popup,
     [Picker.name]: Picker,
     confirmorcancel,
-    //  city
   },
   computed: {
     totalRepaymentAmount() { //已还金额
@@ -208,6 +206,8 @@ export default {
   created() {
     this.item = JSON.parse(this.$route.params.item)
     this.task = JSON.parse(this.$route.params.task)
+    this.publicJs.output(this.item, "银行卡信息")
+    this.publicJs.output(this.task, "this.task")
   },
   methods: {
     executeDateTime(item) {
@@ -233,16 +233,178 @@ export default {
     onClickLeft() {   //返回按钮
       this.publicJs.back();
     },
+    getmerchantNameList() {
+      this.extra = JSON.parse(this.task.extra)
+      queryMerchant(this.task.version.split("-")[0], this.extra, this.task.bankName, this.item).then(res => {
+        this.$refs.verificationMethod.closeAdd()
+        if (res.resp_code == '000000') {
+          this.setQueryMerchant(this.task.version.split("-")[0], res.result)
+          if (this.merchantList.length > 0) {
+            this.task.result.forEach(item => {
+              item.consumeTaskVOs.forEach(items => {
+                var id = Math.floor(Math.random() * this.merchantList.length);
+                items.consumeType = this.merchantList[id].value
+              })
+            });
+            this.merchantList.forEach(type => {
+              var text = {text: type.merchant_display_name, id: type.id, value: type.value}
+              this.columns.push(text)
+            });
+          }
+          this.consumeType = true
+          this.merchantTrueFalseBy = true
+        } else if (res.resp_code == '333333') {
+          this.merchantTrueFalseBy = true
+        } else if (res.resp_code == '999990') {
+          this.merchantTrueFalseBy = true
+        }
+      })
+    },
+    setQueryMerchant(version, item) { // 商户数据处理
+      var obj = {}
+      obj[2] = () => {
+        item.map(items => {
+          items.value = items.merchant_display_name + '(' + items.id + ')'
+        })
+        this.merchantList = item
+      }
+      obj[20] = obj[2]
+      obj[21] = obj[2]
+      obj[25] = () => {
+        if (item.length > 100) {
+          for (let i = 0; i < 50; i++) {
+            item[i].merchant_display_name = item[i].mccName
+            item[i].id = item[i].mccCode
+            item[i].value = item[i].mccName + '-' + item[i].mccCode
+            this.merchantList.push(item[i])
+          }
+        } else {
+          item.map(items => {
+            items.merchant_display_name = items.mccName
+            items.id = items.mccCode
+            items.value = items.mccName + '-' + items.mccCode
+          })
+          this.merchantList = item
+        }
+      }
+      obj[26] = obj[25]
+      obj[30] = obj[2]
+      obj[32] = () => {
+        item.map(items => {
+          items.merchant_display_name = items.mccName
+          items.id = items.mccCode
+          items.value = items.mccName + '-' + items.mccCode
+        })
+        this.merchantList = item
+      }
+      obj[39] = () => {
+        item.map(items => {
+          items.merchant_display_name = items.subMerchantName
+          items.id = items.subMerchantId
+          items.value = items.subMerchantName + '(' + items.subMerchantId + ')'
+        })
+        this.merchantList = item
+      }
+      obj[42] = obj[2]
+      obj[43] = () => {
+        item.map(items => {
+          items.merchant_display_name = items.merchantFullName
+          items.id = items.smBindId
+          items.value = items.merchantFullName + '(' + items.smBindId + ')'
+        })
+        this.merchantList = item
+      }
+      obj[44] = () => {
+        item.map(items => {
+          items.merchant_display_name = items.mccName
+          items.id = items.mccCode
+          items.value = items.mccName + '(' + items.mccCode + ')'
+        })
+        this.merchantList = item
+      }
+      obj[45] = () => {
+        item.map(items => {
+          items.merchant_display_name = items.name
+          items.id = items.code
+          items.value = items.name + '(' + items.code + ')'
+        })
+        this.merchantList = item
+      }
+      obj[46] = () => {
+        item.map(items => {
+          items.merchant_display_name = items.mcc
+          items.id = items.mccCode
+          items.value = '(' + items.mcc + ')'
+        })
+        this.merchantList = item
+      }
+      obj[47] = () => {
+        item.map(items => {
+          items.merchant_display_name = items.termValue
+          items.id = items.termKey
+          items.value = '(' + items.termValue + ')'
+        })
+        this.merchantList = item
+      }
+      obj[52] = () => {
+        item.map(items => {
+          items.merchant_display_name = items.mccName
+          items.id = items.mccCode
+          items.value = items.mccName + '-' + items.mccCode
+        })
+        this.merchantList = item
+      }
+      obj[54] = () => {
+        item.map(items => {
+          items.merchant_display_name = items.mccName
+          items.id = items.mccCode
+          items.value = items.mccName + '(' + items.mccCode + ')'
+        })
+        this.merchantList = item
+      }
+      obj[55] = () => {
+        item.map(items => {
+          items.merchant_display_name = items.mccName
+          items.id = items.mccCode
+          items.value = items.mccName + '(' + items.mccCode + ')'
+        })
+        this.merchantList = item
+      }
+      obj[62] = obj[47]
+      obj[65] = () => {
+        item.map(items => {
+          items.merchant_display_name = items.mccName
+          items.id = items.mccCode
+          items.value = items.mccName + '(' + items.mccCode + ')'
+        })
+        this.merchantList = item
+      }
+      obj[79] = () => {
+        item.map(items => {
+          items.merchant_display_name = items.merName
+          items.id = items.merCode
+          items.value = items.merName + '(' + items.merCode + ')'
+        })
+        this.merchantList = item
+      }
+      obj[83] = () => {
+        item.map(items => {
+          items.merchant_display_name = items.mccName;
+          items.id = items.mccCode;
+          items.value = items.mccName + "(" + items.mccCode + ")";
+        });
+        this.merchantList = item;
+      };
+      return obj[version]()
+    },
     consumeTypeSplit(type) {
       var consumeType = type.consumeType
       if (type.consumeType.split('(').length > 1) {
-        // consumeType=type.consumeType.split('(')[0]
         if (type.consumeType.split('(')[0] == "") {
           consumeType = type.consumeType.split('(')[1].split(')')[0]
         } else {
           consumeType = type.consumeType
         }
-
       } else if (type.consumeType.split('-').length > 1) {
         consumeType = type.consumeType.split('-')[0]
       } else if (type.consumeType.split('|').length > 1) {
@@ -269,7 +431,6 @@ export default {
     },
     merchant(extra, merchantList) {
       this.merchantList = JSON.parse(merchantList)
-      // this.createTask(this.task)
       this.extra = JSON.parse(extra)
     },
     isPassword() {
@@ -289,7 +450,6 @@ export default {
           this.start = res.resp_message
           this.$refs.causeMessage.disopen()
         }
-      }).catch(err => {
       })
     },
     submit() {
@@ -299,6 +459,7 @@ export default {
     isuserable() { //验证用户是否需要绑卡
       this.$store.commit('Loading')
       creditcardmanagerverify(this.userId, this.task.creditCardNumber, this.task.version).then(res => {
+        this.publicJs.output(res, "验证用户是否需要绑卡接口")
         this.$store.commit('closeLoading')
         if (res.resp_code == '000000') {
           this.confirmPlan()
@@ -319,6 +480,7 @@ export default {
           })
         }
       })
+
     },
     confirmPlan() {//执行计划
       this.$store.commit('Loading')
@@ -369,7 +531,7 @@ export default {
               'type': 'h5',
               'deviceId': localStorage.getItem('deviceId')
             }
-          })
+          });
           this.$toast({message: '计划取消成功', position: 'bottom'})
         }
       }).catch(err => {
@@ -393,7 +555,7 @@ export default {
       })
     }
   }
-}
+};
 </script>
 <style scoped>
 

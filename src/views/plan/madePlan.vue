@@ -9,7 +9,7 @@
               <van-col span="3">
                 <div class="card_icon_box">
                   <img class="card_icon"
-                       :src="require('../../assets/bankIcon/BANK_'+item.logimg+'.png')"/>
+                       :src="require('../../assets/bankIcon/BANK_'+item.logimg+'.png')">
                 </div>
               </van-col>
               <van-col span="15" class="card_bank">
@@ -18,7 +18,7 @@
                   <span class="">({{ item.cardNo |cardNoEnd }})</span>
                 </div>
                 <div class="card_type ">
-                  账单日 每月{{ item.billDay }}日｜还款日 每月{{ item.repaymentDay }}日
+                  账单日 每月{{ billDay }}日｜还款日 每月{{ repaymentDay }}日
                 </div>
               </van-col>
 
@@ -86,10 +86,10 @@
                 </div>
               </div>
               <div class="date_model" v-if="arr.length>activeDateLength " @click="showDateLength(arr)">
-                <img src="../../assets/two_bottom.png" alt="">
+                <img src="https://cader-install.oss-cn-shanghai.aliyuncs.com/backManage/two_bottom.png" alt="">
               </div>
               <div class="date_model" v-if='arr.length==activeDateLength' @click="hideDateLength(arr)">
-                <img src="../../assets/two_top.png" alt="">
+                <img src="https://cader-install.oss-cn-shanghai.aliyuncs.com/backManage/two_top.png" alt="">
               </div>
             </div>
           </div>
@@ -297,6 +297,9 @@ export default {
     this.empowerToken = this.$route.query.empowerToken
     this.isFirstEnter = true;
     this.item = JSON.parse(this.$route.params.item);
+    this.billDay = this.item.billDay;
+        this.repaymentDay = this.item.repaymentDay;
+
     this.getDayDate()
     this.getNowFormatDate();
     this.mGetDate(this.year, this.month);
@@ -384,12 +387,12 @@ export default {
       } else {
         if (val == 2) {
           // budgetDay(this.item.userId, this.item.cardNo, this.money, this.autoreservedAmount, this.version, this.dayRepaymentCount).then(res => {
-          let useReserveAmount = Math.pow(1 - 0.0088, this.dayRepaymentCount - 1) * this.autoreservedAmount
+          let useReserveAmount = Math.pow(1 - 0.0085, this.dayRepaymentCount - 1) * this.autoreservedAmount
           let sum = 0
           let count = 0
           while (true) {
             ++count
-            sum += useReserveAmount * (1 - 0.0088) - 1
+            sum += useReserveAmount * (1 - 0.0085) - 1
             if (sum > this.money) break
           }
 
@@ -487,6 +490,7 @@ export default {
         //增加数组key
         i++;
       }
+
       this.dataArr = diffdate;
       if (this.dataArr.length > 0) {
 
@@ -629,7 +633,7 @@ export default {
           this.activeAutoDate = this.arr[0].split("-")[1] + '-' + this.arr[0].split("-")[2] + '~' + this.arr[this.arr.length - 1].split("-")[1] + '-' + this.arr[this.arr.length - 1].split("-")[2]
         }
         this.planDateTrueFalseBy = false
-             this.active = "2";
+        this.active = "2";
       }
 
     },
@@ -654,9 +658,14 @@ export default {
         this.$toast({message: '请选择消费地区', position: 'bottom'})
         return;
       }
+      /**
+       *
+       * creditCardNumber=111&amount=100&reservedAmount=66&executeDate=[]&
+isNotPoint=0&dayRepaymentCount=3&provinceCode=331233&cityCode=332122
+       */
       let date = this.active == 1 ? null : String(this.dateList)
       let params = {
-        empowerToken: this.empowerToken,
+                empowerToken: this.empowerToken,
         creditCardNumber: this.item.cardNo,
         amount: this.money,
         reservedAmount: this.autoreservedAmount,
@@ -684,6 +693,7 @@ export default {
     },
 
     isuserable(item, type, event) {
+
       this.$router.push({name: type, params: {item: JSON.stringify(item), type: 1,empowerToken:this.empowerToken}})
     },
     // 日历
@@ -734,6 +744,7 @@ export default {
           if (i <= 9) {
             i = '0' + i
           }
+
           currentMonthDateArr.push({
             month: 'current', // 只是为了增加标识，区分上下月
             date: i,
@@ -742,6 +753,7 @@ export default {
         }
       }
       this.currentMonthDateLen = currentMonthDateLen
+
       return currentMonthDateArr
     },
     // 获取当月中，上月多余数据，返回数组
@@ -768,6 +780,7 @@ export default {
           date--
         }
       }
+
       this.preMonthDateLen = preMonthDateLen
       return preMonthDateArr
     },
@@ -776,8 +789,7 @@ export default {
       let nextMonthDateLen = 42 - this.preMonthDateLen - this.currentMonthDateLen // 下月多余天数
       let nextMonthDateArr = [] // 定义空数组
       if (nextMonthDateLen > 0) {
-                var current =  parseInt(this.currentMonth) < 9 ? ('0'+(parseInt(this.currentMonth) + 1)) : parseInt(this.currentMonth) + 1;
-
+        var current =  parseInt(this.currentMonth) < 9 ? ('0'+(parseInt(this.currentMonth) + 1)) : parseInt(this.currentMonth) + 1;
         var day = this.currentYear + '-' + current
         if ((parseInt(this.currentMonth) + 1) > 12) {
           day = (this.currentYear + 1) + '-' + '1'
@@ -793,6 +805,7 @@ export default {
           })
         }
       }
+
       return nextMonthDateArr
     },
     // 整合当月所有数据
@@ -803,6 +816,7 @@ export default {
       let allArr = [...preArr, ...currentArr, ...nextArr]
 
       this.allArr = allArr
+
       let sendObj = {
         currentYear: this.currentYear,
         currentMonth: this.currentMonth,

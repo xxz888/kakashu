@@ -1,7 +1,7 @@
 <template>
   <div>
     <van-nav-bar class="agent_nav theme_bg" style="background: none;" :border='false' title="信用管理" left-arrow
-                 @click-left="onClickLeft" />
+                 @click-left="onClickLeft"></van-nav-bar>
     <div class="warpper_top"></div>
     <van-pull-refresh v-model="isLoading" @refresh="onRefresh" loading-text="加载中...">
       <div>
@@ -51,7 +51,8 @@
                 </div>
               </li>
             </ul>
-            <van-empty description="暂无数据" v-else />
+            <van-empty class="credit_empty" v-else
+                         :image="require('../../assets/user_empty.png')"/>
           </div>
         </div>
       </div>
@@ -95,6 +96,7 @@ export default {
     [Search.name]: Search,
     [List.name]: List
   },
+  computed: {},
   created() {
     this._userSonQuotaQuery()
   },
@@ -104,17 +106,17 @@ export default {
     },
     _userSonQuotaQuery() {
       userSonQuotaQuery(this.userSonPhone, this.active, undefined, '1', this.size).then(res => {
+        this.publicJs.output(res, "查询下级用户");
         this.sonList = [];
         if (res.resp_code == "000000") {
           this.sonList = res.result;
         }
-      })
+      });
     },
     // 下拉刷新
     onRefresh() {
       setTimeout(() => {
         this.$toast('刷新成功');
-        // this._userQuotaQuery()
         this.isLoading = false;
       }, 1000);
     },
@@ -135,7 +137,8 @@ export default {
       })
     }
   }
-}
+};
+
 </script>
 <style scoped>
 .agent_nav >>> .van-nav-bar__title.van-ellipsis {

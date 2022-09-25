@@ -1,113 +1,174 @@
 <template>
-  <div>
-    <van-nav-bar title="信用卡还款" class="agent_nav theme_bg" left-arrow @click-left="onClickLeft"
-                  :right-text="empowerToken ? '还款记录' : '使用说明'"
-                 @click-right="onClickRight" />
+  <div class="home">
+    <van-nav-bar
+      title="信用卡还款"
+      left-arrow
+      @click-left="onClickLeft"
+      :right-text="empowerToken ? '还款记录' : '使用说明'"
+      @click-right="help"
+    >
+    </van-nav-bar>
     <div class="warpper">
-      <van-row type="flex" justify="space-between" class="color_999 add_card ">
+      <van-row type="flex" justify="space-between" class="color_999 add_card">
         <ul class="card_rate" v-if="!empowerToken">
           <li>
-            <span class="theme_color">·</span>
-            费率：0.88%（每1万元88元手续费）+1元/次
+            <span class="theme_color">·</span
+            >费率：0.85%（每1万元85元手续费）+1.5元/次
           </li>
           <li>
-            <span class="theme_color">·</span>
-            您是 <span style="color: #F5552A">{{ level.levelName }}</span>用户，每还款1万元可以返<span style="color: #F5552A"> {{ handleFan() }}</span>元
+            <span class="theme_color">·</span
+            >每还款一笔，立返当前金额千分之1的现金
           </li>
         </ul>
-        <ul class="card_rate" v-else>
-          <van-button class="recode_btn theme_btn" @click.native="goRecode()" round type="primary">还款记录</van-button>
-        </ul>
       </van-row>
-      <van-pull-refresh v-model="isLoading" @refresh="onRefresh" :head-height="45">
+      <van-pull-refresh
+        v-model="isLoading"
+        @refresh="onRefresh"
+        :head-height="45"
+      >
         <div class="card_box">
           <div class="card_item" v-for="item in cardList" :key="item.key">
             <div class="van-hairline--bottom card_item_top_box">
-              <van-row type="flex" class="card_item_top" justify="space-between">
-                <van-col span='3'>
+              <van-row
+                type="flex"
+                class="card_item_top"
+                justify="space-between"
+              >
+                <van-col span="3">
                   <div class="card_icon_box">
-                    <img class="card_icon" :src="require('../../assets/bankIcon/BANK_'+item.logimg+'.png')"/>
+                    <img
+                      class="card_icon"
+                      ABC.png
+                      :src="
+                        require('../../assets/bankIcon/BANK_' +
+                          item.logimg +
+                          '.png')
+                      "
+                    />
                   </div>
                 </van-col>
-                <van-col span="16">
+                <van-col span="15">
                   <div class="color_222 card_bank_name van-ellipsis">
                     {{ item.bankName }} &nbsp;
-                    <span class="color_999">({{ item.cardNo |cardNoEnd }})
-                      <span class="size">&nbsp;额度：{{ item.creditBlance }}</span>
-                    </span>
+                    <span class="color_999"
+                      >({{ item.cardNo | cardNoEnd }})</span
+                    >
                   </div>
                   <div class="card_type color_999">
-                    账单日 每月{{ item.billDay }}日｜还款日 每月{{ item.repaymentDay }}日
+                    账单日 每月{{ item.billDay }}日｜还款日 每月{{
+                      item.repaymentDay
+                    }}日
+                  </div>
+                </van-col>
+                <van-col span="4" class="card_right" @click="carddel(item)">
+                  <div class="color_222 card_bank_name">
+                    <van-icon name="cross" class="card_arrow_icon color_999" />
                   </div>
                 </van-col>
               </van-row>
             </div>
-            <van-row v-if="!item.balancePlan" type="flex" justify="space-between" class="plan_detail_box color_666">
+            <van-row
+              v-if="!item.balanceAllAmount && !item.allAmount"
+              type="flex"
+              justify="space-between"
+              class="plan_detail_box color_666"
+            >
               <van-col span="12" class="plan_detail">
                 请及时设置本月还款计划
               </van-col>
               <van-col span="12">
-                <van-button class="bank_btn theme_btn" @click.native="isuserable(item,'madePlan',$event)" round type="primary">
+                <van-button
+                  class="bank_btn"
+                  @click.native="isuserable(item, 'madePlan', $event)"
+                  round
+                  type="primary"
+                >
                   制定计划
                 </van-button>
               </van-col>
             </van-row>
-
-            <van-row v-else-if="item.balancePlan"
-                     type="flex" justify="space-between" class="plan_detail_box " @click.native="detail(item)">
-              <van-col span="16" class="plan_detail  color_666">
-                <div> 请等待
-                  已还款<span>{{ item.balancePlan.repaymentedAmount }}</span>元
+            <van-row
+              v-else-if="
+                (item.balanceAllAmount != 0 || item.allAmount != 0) &&
+                (item.planType == 1 || item.planType == 3)
+              "
+              type="flex"
+              justify="space-between"
+              class="plan_detail_box"
+              @click.native="detail(item)"
+            >
+              <van-col
+                span="16"
+                class="plan_detail color_666"
+                v-if="item.planType == 3"
+              >
+                <div>
+                  请等待，已还款 <span>{{ item.successAmount }}</span
+                  >元
+                </div>
+              </van-col>
+              <van-col span="16" class="plan_detail color_666" v-else>
+                <div>
+                  计划
+                  <span class="plan_status two">{{
+                    item.balancePlanStatus | balanceTaskStatus
+                  }}</span>
+                  ，已还款<span v-if="item.planType == 3">{{
+                    item.successAmount
+                  }}</span>
+                  <span v-else>{{ item.balanceSuccessAmount }}</span
+                  >元
                 </div>
               </van-col>
               <van-col span="7">
-                <span class="plan_status  two">计划详情</span>
-                <z-circle class="circle_box"
-                          :percentage="Math.ceil((item.balancePlan.repaymentedAmount/item.balancePlan.taskAmount)*100)" />
+                <span class="plan_status two">计划详情</span>
+                <z-circle
+                  v-if="item.planType == 3"
+                  class="circle_box"
+                  :percentage="
+                    Math.ceil((item.successAmount / item.allAmount) * 100)
+                  "
+                />
+                <z-circle
+                  v-else
+                  class="circle_box"
+                  :percentage="
+                    Math.ceil(
+                      (item.balanceSuccessAmount / item.balanceAllAmount) * 100
+                    )
+                  "
+                />
               </van-col>
             </van-row>
 
-            <van-row v-else-if="item.planType==2" type="flex" justify="space-between" class="plan_detail_box color_666">
+            <van-row
+              v-else-if="item.planType == 2"
+              type="flex"
+              justify="space-between"
+              class="plan_detail_box color_666"
+            >
               <van-col span="12" class="plan_detail">
                 已制定本月还款计划
               </van-col>
               <van-col span="12">
-                <van-button class="bank_btn" round type="info">制定计划</van-button>
+                <van-button class="bank_btn" round type="info"
+                  >制定计划</van-button
+                >
               </van-col>
             </van-row>
           </div>
-          <nocard v-if="cardList.length==0"></nocard>
+          <nocard v-if="cardList.length == 0"></nocard>
         </div>
       </van-pull-refresh>
       <div class="add_btn theme-linear-bg" @click="addCard()">
-        <van-icon name="add-o"/>
+        <van-icon name="add-o" />
         <span>添加信用卡</span>
       </div>
-      <van-popup
-        v-model="helpTrueFalseBy"
-        position="right" class="help">
-        <div class="help_box">
-          <ul>
-            <li class="help_item van-hairline--bottom" @click="help">
-              <img src="../../assets/help_icon.png" alt="">
-              <span>使用说明</span>
-            </li>
-            <li class="help_item" @click="goDetail">
-              <img src="../../assets/plan_icon.png" alt="">
-              <span>交易记录</span>
-            </li>
-            <li class="help_item" @click="getcard">
-              <img src="../../assets/refresh_icon.png" alt="">
-              <span>点击刷新</span>
-            </li>
-          </ul>
-        </div>
-      </van-popup>
     </div>
   </div>
 </template>
 <script>
-import {repaymentOrderQuery, getPlanNew} from "@/api/bill";
+import { repaymentOrderQuery, getPlanNew } from "@/api/bill";
 import {
   NavBar,
   Tab,
@@ -122,23 +183,26 @@ import {
 } from "vant";
 import {
   cardQuery,
-  bankIconQuery
+  bankDel,
+  userBankAndNature,
+  cardDefault,
+  bankIconQuery,
 } from "@/api/card/card";
+import { newsQuery } from "@/api/showBrand";
+import { creditcardPlanListTwo } from "@/api/plan/plan";
 import nocard from "@/components/nodata/nodata";
 import ZCircle from "@/components/circle/circle";
-import {getLevel} from "@/api/user";
-import listener from "@/api/vueListener"
+import listener from "@/api/vueListener";
 
 export default {
   data() {
     return {
-      yaer: '',
+      yaer: "",
       active: 0,
       isLoading: false,
       count: 0,
       user_id: localStorage.getItem("userId"),
       token: localStorage.getItem("token"),
-      empowerToken: null,
       cardList: [],
       currentdate: "", //当天日期
       year: "",
@@ -157,8 +221,7 @@ export default {
       monthe: "",
       payList: [],
       size: 20,
-      idcard: '',
-      level: {}
+      empowerToken: null,
     };
   },
   components: {
@@ -173,44 +236,32 @@ export default {
     [Button.name]: Button,
     nocard,
     ZCircle,
-    [Popup.name]: Popup
+    [Popup.name]: Popup,
   },
+  computed: {},
   created() {
-    if(this.$route.query.empowerToken){
-      this.empowerToken = this.$route.query.empowerToken
-    }else{
-      this.empowerToken = null
+    
+    if (this.$route.query.empowerToken) {
+      this.empowerToken = this.$route.query.empowerToken;
+    } else {
+      this.empowerToken = null;
     }
-    listener.$on('empowerToken', data => {
+    listener.$on("empowerToken", (data) => {
       if (data) {
-        this.empowerToken = data
-        listener.$emit('empowerToken', null)
+        this.empowerToken = data;
+        listener.$emit("empowerToken", null);
       }
-    })
-    this.getUserLevel()
-    this.getcard()
-    this.getbankIcon()
-    this.getNowFormatDate()
-    this.mGetDate(this.year, this.month)
-    this.getnextmonth(Number(this.timeDay - this.day) + 1)
-    this.getuppermonth(Number(-this.day))
-  },
+    });
 
+    window.getcard = this.getcard;
+    this.getbankIcon();
+    this.getNowFormatDate();
+    this.mGetDate(this.year, this.month);
+    this.getnextmonth(Number(this.timeDay - this.day) + 1);
+    this.getuppermonth(Number(-this.day));
+    this.getcard();
+  },
   methods: {
-    getUserLevel(){
-      getLevel().then(res => {
-        if(res.resp_code == '000000'){
-          this.level = res.result
-        }
-      })
-    },
-    handleFan(){
-      if(this.level.diffRate){
-        return (88-this.level.diffRate.settle*10000).toFixed(0)
-      }else{
-        return 0
-      }
-    },
     getUrlParam(name) {
       //截取url参数
       var reg = new RegExp("(^|\\?|&)" + name + "=([^&]*)(\\s|&|$)", "i");
@@ -218,10 +269,10 @@ export default {
         return unescape(RegExp.$2.replace(/\+/g, " "));
     },
     onClickLeft() {
-      this.publicJs.back()
+      this.$router.push({ name: "home" }); //首页
     },
     onClickRight() {
-      this.helpTrueFalseBy = true
+      this.helpTrueFalseBy = true;
     },
     getuppermonth(dates) {
       //获取上个月月份
@@ -273,13 +324,20 @@ export default {
       this.timeDay = d.getDate();
       return d.getDate();
     },
+    tabSwitch(name, titile) {
+      this.active = name;
+      if (name == 0) {
+        this.getcard();
+      } else {
+        this.getDebitCard();
+      }
+    },
     amount(item) {
       return Math.ceil((item.successAmount / item.allAmount) * 100);
     },
     addCard() {
-      // this.$router.push({name: "debitCardAdd", query: {empowerToken: this.empowerToken}});
-
-         if (
+      
+      if (
         localStorage.getItem("realnameStatus") != 1 &&
         localStorage.getItem("realnameStatus") != null
       ) {
@@ -302,16 +360,13 @@ export default {
         } else {
           this.$router.push({
             name: "depositCardAdd",
-            query: { empowerToken: this.empowerToken },
+            query: { empowerToken: this.empowerToksen },
           });
         }
       }
-
-
-
     },
     getbankIcon() {
-      bankIconQuery().then(icon => {
+      bankIconQuery().then((icon) => {
         if (icon.resp_code == "000000") {
           this.bankIconList = icon.result;
         }
@@ -319,14 +374,12 @@ export default {
     },
     getcard() {
       //查询信用卡
-      this.helpTrueFalseBy = false
-      //从中介代还进来的路由会带身份证号
-      cardQuery(this.user_id, this.empowerToken).then(res => {
+      this.helpTrueFalseBy = false;
+      cardQuery(this.user_id, this.empowerToken).then((res) => {
         this.cardList = [];
         if (res.resp_code == "000000") {
-          res.result.forEach(item => {
+          res.result.forEach((item) => {
             if (item.repaymentDay > item.billDay) {
-              // alert(2)
               if (this.day <= item.repaymentDay) {
                 item.billDaymonth = this.month;
                 item.repaymentDaymonth = this.month;
@@ -350,12 +403,11 @@ export default {
               }
             } else if (item.repaymentDay == item.billDay) {
               if (this.day < item.repaymentDay) {
-                item.billDaymonth = this.uppermonth
-                item.repaymentDaymonth = this.month
-
+                item.billDaymonth = this.uppermonth;
+                item.repaymentDaymonth = this.month;
               } else if (this.day > item.repaymentDay) {
-                item.billDaymonth = this.month
-                item.repaymentDaymonth = this.nextmonth
+                item.billDaymonth = this.month;
+                item.repaymentDaymonth = this.nextmonth;
               }
             }
             for (var j = 0; j < this.bankIconList.length; j++) {
@@ -369,94 +421,128 @@ export default {
               }
             }
             this.$nextTick(() => {
-              this.cardList.push(item)
+              this.cardList.push(item);
             });
           });
         }
-      })
+      });
+      this.getNews();
     },
-    goRecode(){
-        this.goDetail();
+    getDebitCard() {
+      userBankAndNature(this.user_id, 2, 2, 0).then((res) => {
+        this.cardList = [];
+        if (res.resp_code == "000000") {
+          res.result.forEach((item) => {
+            for (var j = 0; j < this.bankIconList.length; j++) {
+              if (item.bankName == this.bankIconList[j].bank_name) {
+                item.logimg = this.bankIconList[j].bank_acronym;
+                item.background = this.bankIconList[j].background;
+                break;
+              } else {
+                item.background = "#232528";
+                item.logimg = "default";
+              }
+            }
+            this.$nextTick(() => {
+              this.cardList.push(item);
+            });
+          });
+        }
+      });
     },
+    goRecode() {},
     goDetail() {
-      var dic = {
-          'phone': this.phone,
-          'token': localStorage.getItem('token'),
-          'brandId': this.brand_id,
-          'userId': this.user_id,
-          'ip': this.global.ip,
-          'type': 'h5',
-          'deviceId': localStorage.getItem('deviceId'),
-          'billtype': "2"
-        };
-        if (this.empowerToken) {
-          dic.empowerToken =  this.empowerToken;
-      }
       this.$router.push({
         path: "/bill",
-        query: dic
-      })
+        query: {
+          phone: this.phone,
+          token: localStorage.getItem("token"),
+          brandId: this.brand_id,
+          userId: this.user_id,
+          ip: this.global.ip,
+          type: "h5",
+          deviceId: localStorage.getItem("deviceId"),
+          billtype: "2",
+        },
+      });
     },
-    detail(items) {  //跳转详情页
+    detail(items) {
+      //跳转详情页
       if (items.planType == 3) {
-        this.yaer = items.planCreateTime.substring(0, 4)
-        this.monthe = items.planCreateTime.substring(5, 7)
-        repaymentOrderQuery(items.brandId, items.userId, this.yaer, this.monthe, this.typetow, this.size).then(res => {
+        this.yaer = items.planCreateTime.substring(0, 4);
+        this.monthe = items.planCreateTime.substring(5, 7);
+        repaymentOrderQuery(
+          items.brandId,
+          items.userId,
+          this.yaer,
+          this.monthe,
+          this.typetow,
+          this.size
+        ).then((res) => {
           if (res.resp_code == "000000") {
             for (let i = 0; i < res.result.content.length; i++) {
               if (items.cardNo == res.result.content[i].creditCardNumber) {
-                if (items.planCreateTime.substring(8, 10) == res.result.content[i].createTime.substring(8, 10)) {
-                  this.payList.push(res.result.content[i])
+                if (
+                  items.planCreateTime.substring(8, 10) ==
+                  res.result.content[i].createTime.substring(8, 10)
+                ) {
+                  this.payList.push(res.result.content[i]);
                 }
               }
             }
             this.$router.push({
-              name: 'executeTask',
+              name: "executeTask",
               params: {
                 item: JSON.stringify(this.payList[0]),
-                type: JSON.stringify(this.typetow)
-              }
-            })
-          }
-        });
-      } else if (items.balancePlan) {
-        this.$store.commit('Loading')
-        getPlanNew({planId: items.balancePlan.id, empowerToken: this.empowerToken}).then(res => {
-          this.$store.commit('closeLoading')
-          if (res.resp_code == '000000') {
-            this.$router.push({
-              name: 'executeTaskNew',
-              params: {item: JSON.stringify(items), task: JSON.stringify(res.result)},
-              query: {empowerToken: this.empowerToken}
+                type: JSON.stringify(this.typetow),
+              },
             });
           }
-        })
+        });
+      } else if (items.planType == 1) {
+        this.$store.commit("Loading");
+        getPlanNew(items.balancePlanId, this.empowerToken).then((res) => {
+          this.$store.commit("closeLoading");
+          if (res.resp_code == "000000") {
+            this.$router.push({
+              name: "executeTaskNew",
+              params: {
+                item: JSON.stringify(items),
+                task: JSON.stringify(res.result),
+              },
+              query: { empowerToken: this.empowerToken },
+            });
+          }
+        });
       }
     },
     isuserable(item, type, event) {
+
       event.cancelBubble = true;
       if (item.repaymentDay == 0 || item.billDay == 0) {
-        this.$dialog.confirm({
+        this.$dialog
+          .confirm({
             title: "温馨提示",
-            message: "请先去设置还款日账单日"
-          }).then(() => {
-            this._router(item, 'updateCard')
+            message: "请先去设置还款日账单日",
+          })
+          .then(() => {
+            this._router(item, "updateCard");
           });
         return;
       }
-
-      if (type == 'taskBill') {
-        this.gettaskbill(item, type)
+      if (type == "taskBill") {
+        this.gettaskbill(item, type);
       } else {
-        this._router(item, type)
+        this._router(item, type);
       }
+      
     },
     _router(item, type) {
       this.$router.push({
         name: type,
-        query: {empowerToken: this.empowerToken},
-        params: {item: JSON.stringify(item)}
-      })
+        params: { item: JSON.stringify(item) },
+        query: { empowerToken: this.empowerToken },
+      });
     },
     gettaskbill(item, type) {
       creditcardPlanListTwo(item.userId, item.cardNo, 1).then((res) => {
@@ -482,42 +568,93 @@ export default {
         }
       });
     },
+    carddel(item) {
+      //删除银行卡
+      this.$dialog
+        .confirm({
+          title: "信用卡解绑",
+          message:
+            "您确定要解绑尾号‘" +
+            item.cardNo.substring(item.cardNo.length - 4, item.cardNo.length) +
+            "’信用卡吗？",
+        })
+        .then(() => {
+          bankDel(this.token, item.cardNo, item.type,this.empowerToken).then((res) => {
+            if (res.resp_code == "000000") {
+              this.$notify({ type: "primary", message: res.resp_message });
+              if (this.active == 0) {
+                this.getcard();
+              } else {
+                this.getDebitCard();
+              }
+            }
+          });
+        });
+    },
+    defaults(item) {
+      cardDefault(this.token, item.cardNo).then((res) => {
+        if (res.resp_code == "000000") {
+          this.$notify({ type: "primary", message: res.resp_message });
+          if (this.active == 0) {
+            this.getcard();
+          } else {
+            this.getDebitCard();
+          }
+        }
+      });
+    },
+    getNews() {
+      newsQuery(this.global.brandId, "功能跳转").then((res) => {
+        if (res.resp_code == "000000") {
+          this.fuwuList = res.result.content;
+        }
+      });
+    },
     help() {
-        if (this.empowerToken) {
+      if (this.empowerToken) {
         this.$router.push({
           name: "bill",
           query: { empowerToken: this.empowerToken },
         });
         return;
       }
-      let num = 0
+
+      let num = 0;
       this.fuwuList.map((key) => {
-        if (key.title == '信用卡还款使用说明') {
-          var url = key.content + '?phone=' + this.phone + '&token=' + this.token + '&brandId=' + this.global.brandId + '&userId=' + this.userId + '&ip=' + this.global.ip + '&deviceId=' + localStorage.getItem('kd_webapp_deviceId')
+        if (key.title == "还款使用说明") {
+          var url =
+            key.content +
+            "?phone=" +
+            this.phone +
+            "&token=" +
+            this.token +
+            "&brandId=" +
+            this.global.brandId +
+            "&userId=" +
+            this.userId +
+            "&ip=" +
+            this.global.ip +
+            "&deviceId=" +
+            localStorage.getItem("kd_webapp_deviceId");
           this.$router.push({
-            name: 'appLink',
+            name: "appLink",
             params: {
               url: JSON.stringify(url),
               title: JSON.stringify(key.title),
-              type: "2"
-            }
+              type: "2",
+            },
           });
-          return
+          return;
         } else {
-          num++
+          num++;
         }
-      })
+      });
       if (num == this.fuwuList.length) {
         this.$toast({
-          message: '敬请期待',
-          position: 'bottom'
-        })
+          message: "敬请期待",
+          position: "bottom",
+        });
       }
-    },
-
-    //URL解码
-    jqueryUrl(url) {
-      return '';
     },
     onRefresh() {
       setTimeout(() => {
@@ -532,7 +669,7 @@ export default {
         this.getcard();
       }, 300);
     },
-  }
+  },
 };
 </script>
 <style scoped>
@@ -540,6 +677,10 @@ export default {
   padding: 10px 15px 50px 15px;
 }
 
+.home {
+  height: 100vh;
+  background: #fff;
+}
 .card_item {
   /* height: 158px; */
   background: rgba(255, 255, 255, 1);
@@ -548,6 +689,10 @@ export default {
   margin-bottom: 10px;
   padding: 10px 15px;
   font-size: 14px;
+}
+
+.card_right {
+  text-align: right;
 }
 
 .card_icon_box {
@@ -582,13 +727,67 @@ export default {
   font-size: 12px;
 }
 
+.card_creditBlance {
+  font-size: 17px;
+}
+
+.card_bank_tips {
+  font-size: 12px;
+}
+
+.card_cont {
+  font-size: 13px;
+  padding: 10px 0;
+}
+
+/* .card_cont span {
+  font-size: 16px;
+  color: #ff1d3b;
+} */
+.card_taskStatus1 {
+  color: #35a7fd !important;
+}
+
+.card_taskStatus2 {
+  color: #51c854 !important;
+}
+
+.card_taskStatus0 {
+  color: #ffc107 !important;
+}
+
+.card_bottom {
+  line-height: 25px;
+}
+
+.card_arrow_text {
+  vertical-align: middle;
+}
+
+.card_arrow_icon {
+  vertical-align: middle;
+}
+
+.card_del {
+  height: 100%;
+}
+
 .card_item_top_box {
   padding-bottom: 10px;
 }
 
+.bank_date {
+  font-size: 26px;
+  font-weight: 500;
+  line-height: 36px;
+}
+
+.bank_btn_box {
+  position: relative;
+}
+
 .bank_btn {
   height: 27px;
-  border: none;
   line-height: 27px;
   font-size: 13px;
   position: absolute;
@@ -596,14 +795,6 @@ export default {
   bottom: 0;
   top: 0;
   margin: auto;
-}
-
-.recode_btn {
-  height: 27px;
-  border: none;
-  line-height: 27px;
-  font-size: 13px;
-  float: right
 }
 
 .circle_box {
@@ -612,6 +803,22 @@ export default {
   bottom: 0;
   top: 0;
   margin: auto;
+}
+
+#addcard {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  position: fixed;
+  background: url("../../assets/help.png") center no-repeat;
+  background-size: 100% 100%;
+  right: 5px;
+  bottom: 60px;
+  z-index: 500;
+  text-align: center;
+  font-size: 14px;
+  color: #fff;
+  padding: 10px 0;
 }
 
 .plan_detail_box {
@@ -640,14 +847,14 @@ export default {
   font-weight: 500;
   font-size: 14px;
   padding-right: 5px;
-
 }
 
 .add_card .right {
   text-align: right;
 }
 
-.add_card .right span, .van-icon {
+.add_card .right span,
+.van-icon {
   vertical-align: middle;
 }
 
@@ -675,10 +882,19 @@ export default {
   color: rgb(248, 153, 67);
 }
 
+.plan_status.one {
+  color: #35cc20;
+}
+
+>>> .help.van-popup--right {
+  top: 100px !important;
+  right: 10px;
+  border-radius: 10px;
+}
+
 .help_box {
   font-size: 14px;
   padding: 10px 15px;
-
 }
 
 .help_item {
@@ -696,18 +912,10 @@ export default {
   vertical-align: middle;
 }
 
-.agent_nav >>> .van-nav-bar__title.van-ellipsis {
-  color: #fff;
-}
-
-.agent_nav >>> .van-icon {
-  color: #FFFFFF !important;
-}
-
 .aliW {
   height: 60px;
   color: #fff;
-  background: #ff3735;
+  background: #9B3C9D;
   text-align: center;
   line-height: 60px;
   font-size: 28px;
@@ -715,9 +923,4 @@ export default {
   bottom: 0;
   width: 100%;
 }
-
-.size {
-  font-size: 12px;
-}
-
 </style>

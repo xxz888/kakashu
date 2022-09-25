@@ -1,10 +1,8 @@
 <template>
-  <!-- <div class=""> -->
   <div class="nodata">
     <div class="noaddress_img"></div>
     <div class="nodata_title color_999">暂无地址</div>
   </div>
-  <!-- </div> -->
 </template>
 
 <script>

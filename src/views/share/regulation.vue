@@ -2,7 +2,8 @@
   <div>
     <van-nav-bar title="收益规则" left-arrow fixed @click-left="onClickLeft"/>
     <div class="zhanwei"></div>
-    <div class="partner_cont"></div>
+    <div class="partner_cont">
+    </div>
   </div>
 </template>
 
@@ -30,15 +31,11 @@ export default {
     [Dialog.Component.name]: Dialog.Component,
     [Empty.name]: Empty,
   },
-  created() {
-    this.getNewsList()
-  },
+  created() {},
   methods: {
     // 下拉刷新
     onRefresh() {
       setTimeout(() => {
-        // this.$toast('刷新成功');
-        this.getNewsList()
         this.isLoading = false;
       }, 1000);
     },

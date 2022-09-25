@@ -1,7 +1,7 @@
 <template>
   <div>
     <van-nav-bar class="agent_nav theme_bg" style="background: none;" :border='false' title="丢失信用" left-arrow
-                 @click-left="onClickLeft" />
+                 @click-left="onClickLeft"></van-nav-bar>
     <div class="warpper_top"></div>
     <van-pull-refresh v-model="isLoading" @refresh="onRefresh" loading-text="加载中...">
       <div>
@@ -26,10 +26,16 @@
             </div>
           </li>
         </ul>
-         <van-empty description="暂无数据"  v-else/>
+        <van-empty class="user_empty" v-else
+                         :image="require('../../assets/user_empty.png')"/>
       </div>
     </van-pull-refresh>
-    <van-popup v-model="detailTrueFasleBy" closeable position="bottom" close-icon-position="top-left" :style="{ height: '70%' }">
+    <van-popup
+      v-model="detailTrueFasleBy"
+      closeable
+      position="bottom"
+      close-icon-position="top-left"
+      :style="{ height: '70%' }">
       <div>
         <div class="detail_title  van-hairline--bottom ">付款详情</div>
         <div class="detail_cont">
@@ -143,6 +149,7 @@ export default {
     makeUp(item) {
       this.active = item
       userQuotaSumQuery().then(res => {
+        this.publicJs.output(res, "获取用户弥补金额统计");
         if (res.resp_code == "000000") {
           this.sum = res.result
         }
@@ -237,12 +244,12 @@ export default {
 .credit_list_item .right .amount {
   font-size: 20px;
   line-height: 43px;
-  color: #F63802;
+  color: #9B3C9D;
 }
 
 .credit_list_item .right .amountT {
   font-size: 16px;
-  color: #F63802;
+  color: #9B3C9D;
 }
 
 .credit_list_item .right .btn {

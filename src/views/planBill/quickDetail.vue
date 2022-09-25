@@ -6,16 +6,16 @@
       <div class="header">
         <div>
           <img :src="item.imglog" alt="">
-          <h4>{{ item.channelName }}</h4>
+          <h4>{{ item.channelname }}</h4>
           <i>{{ item.rate * 100 |toFixed }}%</i>
         </div>
-        <p><span style="color: #4cc566;">￥{{ item.amount |toFixed }}</span></p>
+        <p><span style="color: #9B3C9D;">￥{{ item.amount |toFixed }}</span></p>
         <span class="status">订单状态：{{ item.orderStatus |status }}</span>
       </div>
       <van-cell-group>
         <van-cell title="到账金额" center :value="item.realAmount.toFixed(2)+'元'"/>
         <van-cell title="手续费用" center :value="(item.amount-item.realAmount).toFixed(2)+'元'"/>
-        <van-cell title="到帐卡" center :value="item.debitBankCard"/>
+        <van-cell title="商品说明" center :value="item.remark"/>
         <van-cell title="创建日期" center :value="item.createTime"/>
         <van-cell title="订单号" center :value="item.orderCode"/>
       </van-cell-group>
@@ -65,9 +65,10 @@ export default {
           }
         }
       })
-    }
+    },
   }
 }
+
 </script>
 <style scoped>
 .main {

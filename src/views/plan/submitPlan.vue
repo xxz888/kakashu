@@ -1,6 +1,5 @@
 <template>
   <div>
-    <!-- <van-nav-bar title="设置还款计划"  left-arrow @click-left="onClickLeft"  @click-right="temporaryplan"  right-text="重选地区"   /> -->
     <van-nav-bar title="设置还款计划" left-arrow @click-left="onClickLeft"/>
     <div class="warpper">
       <div class="submit_plan_box">
@@ -11,8 +10,7 @@
                 <div class="card_icon_box">
                   <img
                     class="card_icon"
-                    :src="require('../../assets/bankIcon/BANK_'+item.logimg+'.png')"
-                  />
+                    :src="require('../../assets/bankIcon/BANK_'+item.logimg+'.png')"/>
                 </div>
               </van-col>
               <van-col span="20" class="card_bank">
@@ -102,7 +100,6 @@
           <div v-if="!merchantTrueFalseBy" @click="temporaryplan()" class="confirmplan_btn two theme_btn">启动计划</div>
           <div v-if="merchantTrueFalseBy" @click="confirmPlan()" class="confirmplan_btn two theme_btn">启动计划</div>
         </div>
-
       </div>
     </div>
     <van-popup position="bottom" :style="{ height: '45%' }" v-model="show">
@@ -122,7 +119,8 @@ import {NavBar, Row, Col, Icon, Popup, Picker} from 'vant';
 import city from "@/components/city/city"
 import confirmorcancel from '@/components/confirm/alert'
 import isPassword from "@/components/isPassword/isPassword"
-import {creditcardTask, creditcardSaveTask, isChannelBind} from "@/api/plan/plan";
+import {queryMerchant} from "@/api/city/city";
+import {creditcardTask, creditcardSaveTask} from "@/api/plan/plan";
 import request from '@/utils/request'
 import qs from 'qs'
 
@@ -185,7 +183,6 @@ export default {
       defConsumeType: 0,//默认
       message: '获取验证码',
       num: 60,
-
       start: '为保障用户还款时的多元化场景，更有利于养卡提额，建立一个还款多元化消费、多通道介入机制和即时切换机制，请您确认是否体验此功能',
       getSmsUrl: '',
       confirmSmsUrl: '',
@@ -209,15 +206,184 @@ export default {
     this.item = JSON.parse(this.$route.params.item)
     this.task = JSON.parse(this.$route.params.task)
     this.district = JSON.parse(this.$route.params.extra)
+    this.task.extra
+    this.publicJs.output(this.item, "银行卡信息")
+    this.publicJs.output(this.task, "生成临时任务")
     this.getmerchantNameList()
   },
   methods: {
     onClickLeft() {
       this.publicJs.back();
     },
+    getmerchantNameList() {
+      this.extra = this.district
+      queryMerchant(this.task.version.split("-")[0], this.extra, this.task.bankName, this.item).then(res => {
+        this.$refs.verificationMethod.closeAdd()
+        if (res.resp_code == '000000') {
+          this.setQueryMerchant(this.task.version.split("-")[0], res.result)
+          if (this.merchantList.length > 0) {
+            this.task.result.forEach(item => {
+              item.consumeTaskVOs.forEach(items => {
+                var id = Math.floor(Math.random() * this.merchantList.length);
+                items.consumeType = this.merchantList[id].value
+              })
+            });
+            this.merchantList.forEach(type => {
+              var text = {text: type.merchant_display_name, id: type.id, value: type.value}
+              this.columns.push(text)
+            });
+          }
+          this.consumeType = true
+          this.merchantTrueFalseBy = true
+        } else if (res.resp_code == '333333') {
+          this.merchantTrueFalseBy = true
+        } else if (res.resp_code == '999990') {
+          this.merchantTrueFalseBy = true
+        }
+      })
+    },
+    // 商户数据处理
+    setQueryMerchant(version, item) {
+      var obj = {}
+      obj[2] = () => {
+        item.map(items => {
+          items.value = items.merchant_display_name + '(' + items.id + ')'
+        })
+        this.merchantList = item
+      }
+      obj[20] = obj[2]
+      obj[21] = obj[2]
+      obj[25] = () => {
+        if (item.length > 100) {
+          for (let i = 0; i < 50; i++) {
+            item[i].merchant_display_name = item[i].mccName
+            item[i].id = item[i].mccCode
+            item[i].value = item[i].mccName + '-' + item[i].mccCode
+            this.merchantList.push(item[i])
+          }
+        } else {
+          item.map(items => {
+            items.merchant_display_name = items.mccName
+            items.id = items.mccCode
+            items.value = items.mccName + '-' + items.mccCode
+          })
+          this.merchantList = item
+        }
+      }
+      obj[26] = obj[25]
+      obj[30] = obj[2]
+      obj[32] = () => {
+        item.map(items => {
+          items.merchant_display_name = items.mccName
+          items.id = items.mccCode
+          items.value = items.mccName + '-' + items.mccCode
+        })
+        this.merchantList = item
+      }
+      obj[39] = () => {
+        item.map(items => {
+          items.merchant_display_name = items.subMerchantName
+          items.id = items.subMerchantId
+          items.value = items.subMerchantName + '(' + items.subMerchantId + ')'
+        })
+        this.merchantList = item
+      }
+      obj[42] = obj[2]
+      obj[43] = () => {
+        item.map(items => {
+          items.merchant_display_name = items.merchantFullName
+          items.id = items.smBindId
+          items.value = items.merchantFullName + '(' + items.smBindId + ')'
+        })
+        this.merchantList = item
+      }
+      obj[44] = () => {
+        item.map(items => {
+          items.merchant_display_name = items.mccName
+          items.id = items.mccCode
+          items.value = items.mccName + '(' + items.mccCode + ')'
+        })
+        this.merchantList = item
+      }
+      obj[45] = () => {
+        item.map(items => {
+          items.merchant_display_name = items.name
+          items.id = items.code
+          items.value = items.name + '(' + items.code + ')'
+        })
+        this.merchantList = item
+      }
+      obj[46] = () => {
+        item.map(items => {
+          items.merchant_display_name = items.mcc
+          items.id = items.mccCode
+          items.value = '(' + items.mcc + ')'
+        })
+        this.merchantList = item
+      }
+      obj[47] = () => {
+        item.map(items => {
+          items.merchant_display_name = items.termValue
+          items.id = items.termKey
+          items.value = '(' + items.termValue + ')'
+        })
+        this.merchantList = item
+      }
+      obj[52] = () => {
+        item.map(items => {
+          items.merchant_display_name = items.mccName
+          items.id = items.mccCode
+          items.value = items.mccName + '-' + items.mccCode
+        })
+        this.merchantList = item
+      }
+      obj[54] = () => {
+        item.map(items => {
+          items.merchant_display_name = items.mccName
+          items.id = items.mccCode
+          items.value = items.mccName + '(' + items.mccCode + ')'
+        })
+        this.merchantList = item
+      }
+      obj[55] = () => {
+        item.map(items => {
+          items.merchant_display_name = items.mccName
+          items.id = items.mccCode
+          items.value = items.mccName + '(' + items.mccCode + ')'
+        })
+        this.merchantList = item
+      }
+      obj[62] = obj[47]
+      obj[65] = () => {
+        item.map(items => {
+          items.merchant_display_name = items.mccName
+          items.id = items.mccCode
+          items.value = items.mccName + '(' + items.mccCode + ')'
+        })
+        this.merchantList = item
+      }
+      obj[79] = () => {
+        item.map(items => {
+          items.merchant_display_name = items.merName
+          items.id = items.merCode
+          items.value = items.merName + '(' + items.merCode + ')'
+        })
+        this.merchantList = item
+      }
+      obj[83] = () => {
+        item.map(items => {
+          items.merchant_display_name = items.mccName;
+          items.id = items.mccCode;
+          items.value = items.mccName + "(" + items.mccCode + ")";
+        });
+        this.merchantList = item;
+      };
+      return obj[version]()
+    },
     createTask(item) {
       this.$store.commit('Loading')
       creditcardTask(item.userId, item.brandId, item.creditCardNumber, item.amount, item.reservedAmount, String(item.executeDate), item.version, localStorage.getItem('isNotPoint'), item.dayRepaymentCount).then(res => {
+        this.publicJs.output(res, "生成临时任务")
         this.$store.commit('closeLoading')
         if (res.resp_code == '000000') {
           if (this.merchantList.length > 0) {
@@ -226,7 +392,7 @@ export default {
                 var id = Math.floor(Math.random() * this.merchantList.length);
                 items.consumeType = this.merchantList[id].value
               })
-            });
+            })
             this.merchantList.forEach(type => {
               var text = {text: type.merchant_display_name, id: type.id, value: type.value}
               this.columns.push(text)
@@ -305,6 +471,7 @@ export default {
           }, 1000)
           this.$toast({message: '验证码发送成功,请注意查收', position: 'bottom'})
         }
+
       })
     },
     topClose() {  //点击 x 跳转到信用卡列表
@@ -335,12 +502,8 @@ export default {
       this.extra = JSON.parse(extra)
     },
     temporaryplan() {
-      // this.$refs.verificationMethod.choseAdd()
       this.$refs.verificationMethod.firstSelPro()
     },
-    //  showPlanBill(){
-    //    this.$refs.planBillTips.planBillTipsTrueFalseBy=true
-    //  },
     isPassword() {
       let yanzheng = this.global.dontPayPawBrandid.indexOf(Number(this.task.brandId))
       if (yanzheng == -1) {
@@ -353,7 +516,6 @@ export default {
       var province = this.extra.merprovince + '-' + this.extra.mercity + '-' + this.extra.merarea;
       var json = JSON.stringify(this.task.result);
       var version = this.task.version.split("-")[0]
-      // return
       if (version == 4 || version == 8 || version == 43 || version == 58 || version == 59 || version == 54 || version == 55 || version == 61 || version == 65 || version == 50 || version == 75 || version == 84) {
         province = this.extra.merprovince + '-' + this.extra.mercity + '[' + this.extra.merarea + ']'
       } else if (version == 32 || version == 39 || version == 46 || version == 47 || version == 52 || version == 62 || version == 66 || version == 69 || version == 71 || version == 73 || version == 74 || version == 76 || version == 80 || version == 81 || version == 82 || version == 83 || version == 86 || version == 89) {
@@ -365,7 +527,6 @@ export default {
       } else {
         province = this.extra.merprovince + '-' + this.extra.mercity + '-' + this.extra.provinceId.split(',')[0] + '-' + this.extra.cityCode.split(',')[0]
       }
-
       this.$store.commit('Loading')
       creditcardSaveTask(json, this.task.amount, this.task.reservedAmount, this.task.version, province, '', JSON.stringify(this.extra), this.task.couponId, this.item.cardNo).then(res => {
         this.$store.commit('closeLoading')

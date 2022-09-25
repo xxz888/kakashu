@@ -4,7 +4,7 @@
     <div class="zhanwei"></div>
     <div class="shareImg">
       <img :src="canvasImg" alt="" @click="dol()" v-if="!showImg">
-      <img class="beijing" src="../../assets/share/sharePage.png" alt="" v-if="showImg">
+      <img class="beijing" src="../../assets/share/sharePage1.png" alt="" v-if="showImg">
       <div id="qrcode" style="width: 200px;height: 240px;background-color: white;margin-top:20px;" v-if="showImg"></div>
       <img v-show="false" class="canvaslogo" src="../../assets/logo.png"/>
       <img v-show="false" class="toplogo" src="../../assets/logo_t.png"/>
@@ -119,8 +119,8 @@ export default {
             cvs.fillStyle = "#FFF";
             cvs.fillRect(0, 0, c.width, c.height);
             let codeTemp = 6 // 二维码外部边缘宽度
-            let x = 256 * bili + codeTemp //二维码的起始位置
-            let y = 970 * bili + codeTemp
+            let x = 256 * bili + codeTemp + 2//二维码的起始位置
+            let y = 970 * bili + codeTemp+9
 
             let imgCodeWidth = 240 * bili - codeTemp * 2 //二维码的宽
             let imgCodeHeight = 240 * bili - codeTemp * 2 //二维码的高度
@@ -142,7 +142,7 @@ export default {
             cvs.drawImage(topSrc, topX, topY, topW, topH);
 
             let textX = c.width / 2 // 文案起始高度位置
-            let nameT = 1240 * bili * ratio
+            let nameT = (1240 * bili * ratio) + 20
             cvs.fillStyle = '#fff'; // 文字填充颜色
             cvs.textAlign = 'center'
             cvs.font = 14 * ratio + 'px bold sans-serif';

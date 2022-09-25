@@ -7,7 +7,7 @@
         <div class="card_item">
           <van-field v-model="card.userName" label="持卡人" readonly="readonly"/>
           <van-field v-model="card.cardNo" label="卡号" placeholder="请输入信用卡号" clearable minlength="10"
-                     readonly="readonly" />
+                     readonly="readonly"></van-field>
           <van-field v-model="card.securityCode" label="安全码" maxlength="3" readonly="readonly"
                      placeholder="请输入(卡背面CVN2后三位数字)" clearable>
           </van-field>
@@ -29,7 +29,9 @@
 </template>
 <script>
 import {NavBar, Cell, CellGroup, Field, Picker, Popup, Button, Icon} from 'vant';
+import {creditcardTask} from "@/api/plan/plan";
 import request from '@/utils/request'
+import {userInfoQuery} from '@/api/user'
 import qs from 'qs'
 
 export default {

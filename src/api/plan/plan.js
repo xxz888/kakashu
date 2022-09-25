@@ -25,7 +25,7 @@ export function isChannelBind(bankCard,idCard,phone,userName,bankName,expiredTim
 /** 查询通道是否绑定 */
 export function buildChannel(params){
   return request({
-    url:'/creditcardmanager/app/balance/verify/band/card',
+    url:'/creditcardmanager/app/balance/verify/band/card/new',
     method: 'post',
     params
 })
@@ -120,9 +120,17 @@ export function creditcardTask(userId, brandId,creditCardNumber,amount, reserved
 }
 
 /**  生成任务接口 (token,POST)  */
+// export function creditcardTaskNew(params) {
+//   return request({
+//     url: '/creditcardmanager/app/create/repayment/task/new',
+//     method: 'post',
+//     params
+//   })
+// }
+/**  生成任务接口 (token,POST)  */
 export function creditcardTaskNew(params) {
   return request({
-    url: '/creditcardmanager/app/create/repayment/task/new',
+    url: '/creditcardmanager/app/create/balance/plan/new',
     method: 'post',
     params
   })
@@ -145,6 +153,7 @@ export function creditcardSaveTask(taskJSON, amount,reservedAmount, version,city
     }),
   })
 }
+
 // 自定义还款验证信用卡是否支持和授权
 /**   任务管理任务卡验证 (token,POST)  */
 export function cardIsuserable(userId, brandId, creditCardNumber, version,repaymentType) {

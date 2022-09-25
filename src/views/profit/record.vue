@@ -1,8 +1,8 @@
 <template>
-  <!-- 多多保重 -->
   <div style="background: #fff;">
-    <van-nav-bar class="agent_nav theme_bg" style="background: none;" :border='false' title="提现记录" left-arrow
-                 @click-left="onClickLeft" />
+    <van-nav-bar class="agent_nav theme_bg" style="background: none;" :border='false' :title="title" left-arrow
+                 @click-left="onClickLeft">
+    </van-nav-bar>
     <div class="warpper_top"></div>
     <van-pull-refresh v-model="isLoading" @refresh="onRefresh" loading-text="加载中...">
       <div>
@@ -10,34 +10,76 @@
           <ul>
             <li class="item">
               <div class="left">
-                <div class="title">
-                  <span>提现总金额 {{ totalAmount|toFixed }} （元）</span>
+                <div class="title"><span v-if='queryType==8'>提现总金额</span><span
+                  v-else-if='queryType==7'>弥补总额度</span><span v-else-if='queryType==4'>达标总奖励</span>（元）
                 </div>
+                <div class="amount">{{ order.totalAmount |toFixed }}</div>
               </div>
               <div class="right"></div>
+            </li>
+            <li class="item">
+              <div class="left">
+                <div class="title"><span v-if='queryType==8'>当日提现</span><span
+                  v-else-if='queryType==7'>当日弥补额度</span><span v-else-if='queryType==4'>当日收益</span>（元）
+                </div>
+                <div class="profit_amount">{{ order.todayAmount |toFixed }}</div>
+              </div>
+              <div class="right">
+                <div class="title"><span v-if='queryType==8'>当月提现</span><span
+                  v-else-if='queryType==7'>当月弥补额度</span><span v-else-if='queryType==4'>当月收益</span>（元）
+                </div>
+                <div class="profit_amount">{{ order.monthAmount |toFixed }}</div>
+              </div>
             </li>
           </ul>
         </div>
         <div class="profit_share_cont">
           <div class="profit_type_top">
-            <div class="profit_type_detail_top_bg">
-              <div>时间</div>
-              <div>金额</div>
-              <div>状态</div>
+            <div class="profit_type_detail_top_bg" v-if="queryType==4">
+              <div>日期</div>
+              <div>姓名</div>
+              <div>金额（元）</div>
+            </div>
+            <div class="profit_type_record" v-else>
+              <div>当日<span v-if='queryType==8'>提现</span><span v-else-if='queryType==7'>弥补</span>(笔):<span class="theme">{{
+                  order.todayCount
+                }}</span>
+              </div>
+              <div>当月<span v-if='queryType==8'>提现</span><span v-else-if='queryType==7'>弥补</span>(笔):<span class="theme">{{
+                  order.monthCount
+                }}</span>
+              </div>
             </div>
           </div>
-          <van-list v-model="isupLoading" :finished="finished" finished-text="" @load="onLoad">
-            <ul class="cash_list" v-if="profit.length>0">
-              <li class="cash_item van-hairline--bottom" v-for="item in profit" :key="item.id">
-                <div class="type">{{ item.createTime }}</div>
-                <div class="amount">{{ item.amount|toFixed }}</div>
-                <div class="theme amount">{{ handleStatus(item.orderStatus) }}</div>
-              </li>
-            </ul>
-            <van-empty  v-else 
-                       description="还没有记录,请先去推广吧">
-            </van-empty>
-          </van-list>
+          <ul class="profit_type_date" v-if="order.detail.length>0 && queryType==4 ">
+            <li class="item van-hairline--bottom" v-for="(item,index) in order.detail" :key="index">
+              <div class="type">{{ item.tradeTime.split('-')[1] + '/' + item.tradeTime.split('-')[2] }}</div>
+              <div>{{ item.userName }}</div>
+              <div class="active">{{ item.tradeAmount |toFixed }}</div>
+            </li>
+          </ul>
+          <ul class="profit_type_date" v-else-if="order.detail.length>0 && queryType!=4 ">
+            <li class=" van-hairline--bottom">
+              <img src="../../assets/profit/title_icon.png" alt="">
+              <span class="theme"><span v-if='queryType==8'>提现</span><span v-else-if='queryType==7'>弥补</span>历史记录</span>
+            </li>
+            <li class="record van-hairline--bottom" v-for="(item,index) in order.detail" :key="index">
+              <div>
+                <div><span v-if='queryType==8'>提现</span><span v-else-if='queryType==7'>弥补</span>金额</div>
+                <p>{{ item.tradeTime }}</p>
+              </div>
+              <div>
+                <span>{{ item.tradeAmount |toFixed }}</span>
+                <!-- <p class="status">{{item.status| withdrawal}}</p> -->
+              </div>
+            </li>
+          </ul>
+          <van-empty class="user_empty" v-else
+                     description="还没有记录,请前去立即推广哦">
+            <van-button round @click="next('/sharePage','8')" class="bottom-button theme-linear-bg color_fff ">
+              立即推广
+            </van-button>
+          </van-empty>
         </div>
       </div>
     </van-pull-refresh>
@@ -51,25 +93,32 @@ import {
   Icon,
   DropdownMenu,
   DropdownItem,
-  List,
   empty,
   Button
 } from 'vant';
-import {withdrawOrderList} from "@/api/profit";
+import {
+  orderDetailQuery
+} from "@/api/profit";
 
 export default {
   data() {
     return {
-      form: {
-        page: 0,
-        size: 20
-      },
-      totalAmount: 0,
+      brandId: localStorage.getItem('brandId'),
+      userId: localStorage.getItem('userId'),
+      phone: localStorage.getItem('phone'),
       isLoading: false,
-      profit: [],
-      isupLoading: false,
-      finished: false
-    }
+      fuwuList: [],
+      queryType: 4, //1:快捷,2:余额还款,3:空卡还款,6:花呗
+      title: "达标奖励",
+      order: {
+        detail: [],
+        monthAmount: 0,
+        monthCount: 0,
+        todayAmount: 0,
+        todayCount: 0,
+        totalAmount: 0,
+      }
+    };
   },
   components: {
     [NavBar.name]: NavBar,
@@ -77,43 +126,31 @@ export default {
     [Icon.name]: Icon,
     [DropdownMenu.name]: DropdownMenu,
     [DropdownItem.name]: DropdownItem,
-    [List.name]: List,
     [empty.name]: empty,
     [Button.name]: Button
   },
+  computed: {},
   created() {
-    this.totalAmount = this.$route.params.type
+    this.title = JSON.parse(this.$route.params.title)
+    this.queryType = JSON.parse(this.$route.params.level)
+    this._orderDetailQuery()
   },
   methods: {
     onClickLeft() {
       this.publicJs.back();
     },
-    getData() {
-      withdrawOrderList(this.form).then(res => {
+    dateChange() {
+      this._orderDetailQuery()
+    },
+    _orderDetailQuery() {
+      orderDetailQuery(this.queryType, 20).then(res => {
         if (res.resp_code == '000000') {
-          this.isLoading = false;
-          this.profit.push(...res.result.content)
-          if (res.result.content.length < this.form.size) {
-            this.finished = true;
-          }
+          this.order = res.result
         }
       })
     },
-    handleStatus(status){
-      switch (status){
-        case 0:
-          return '处理中'
-        case 1:
-          return '已成功'
-        case 2:
-          return '已失败'
-        default:
-          return '未知状态'
-      }
-    },
-    onLoad(){
-      this.form.page++
-      this.getData()
+    next(name, level, type, title) {
+      this.$router.push({path: name});
     },
     // 下拉刷新
     onRefresh() {
@@ -121,7 +158,7 @@ export default {
         this.$toast('刷新成功');
         this.isLoading = false;
       }, 1000);
-    }
+    },
   }
 }
 </script>
@@ -230,11 +267,10 @@ export default {
 
 .profit_type_date .item div {
   flex: 1;
-  line-height: 40px;
 }
 
 .active {
-  color: #F63802;
+  color: #9B3C9D;
 }
 
 .profit_type_date .type {
@@ -277,8 +313,8 @@ export default {
 }
 
 .profit_type_date .record span {
-  font-size: 20px;
-  color: #F63802;
+  font-size: 18px;
+  color: #9B3C9D;
   position: absolute;
   height: 25px;
   right: 0;
@@ -288,23 +324,15 @@ export default {
   display: inline-block;
 }
 
-.cash_item {
-  height: 44px;
-  font-size: 12px;
-
-  line-height: 44px;
-  display: flex;
-  text-align: center;
-
-  background: #fff;
-  color: #333;
-}
-
-.cash_item .type {
-  width: 140px;
-}
-
-.cash_item .amount {
-  flex: 1;
+.status {
+  color: #9B3C9D !important;
+  font-size: 12px !important;
+  position: absolute;
+  height: 25px;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  margin-top: 20px;
+  display: inline-block;
 }
 </style>

@@ -5,6 +5,7 @@
     </van-dialog>
   </div>
 </template>
+
 <script>
 import {Dialog} from 'vant';
 

@@ -5,18 +5,12 @@
       <van-pull-refresh v-model="isLoading" @refresh="onRefresh">
         <van-row v-for=" (item,index) of leaveMassgeList" :key="index">
           <van-row>
-            <van-col span="24">
-              <span class="time">{{ item.createTime }}</span>
-            </van-col>
+            <van-col span="24"><span class="time">{{ item.createTime }}</span></van-col>
           </van-row>
-          <van-col span="3">
-            <img width="30px" src="../../assets/logo.png">
-          </van-col>
-          <van-col span="21">
-            <p class="content" @click=" (item.content.indexOf('在线客服')> -1) ? meiqia():'' "
-               v-html="handlerContent(item.content)">
-            </p>
-          </van-col>
+          <van-col span="3"><img width="30px"
+                                 src="../../assets/logo.png"></van-col>
+          <van-col span="21"><p class="content" @click=" (item.content.indexOf('在线客服')> -1) ? meiqia():'' "
+                                v-html="handlerContent(item.content)"></p></van-col>
         </van-row>
       </van-pull-refresh>
     </div>

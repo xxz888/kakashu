@@ -1,36 +1,40 @@
 <template>
   <div style="background: #fff;">
-    <van-nav-bar class="agent_nav theme_bg" style="background: none;" :border='false' :title="handleTitle()" left-arrow
+    <van-nav-bar class="agent_nav theme_bg" style="background: none;" :border='false' title="返现记录" left-arrow
                  @click-left="onClickLeft">
     </van-nav-bar>
     <div class="warpper_top"></div>
     <van-pull-refresh v-model="isLoading" @refresh="onRefresh" loading-text="加载中...">
       <div>
         <div class="profit_share_top theme_bg">
-          <van-dropdown-menu class="date_sel menu" active-color="#4cc566" background="none">
+          <van-dropdown-menu class="date_sel menu" active-color="#9B3C9D" background="none">
             <van-dropdown-item v-model="yaer" :options="yearList" @change="dateChange"/>
             <van-dropdown-item v-model="month" :options="monthList" @change="dateChange"/>
           </van-dropdown-menu>
         </div>
         <div class="cash_box">
           <div class="cash_title">
-            <div class="type">时间</div>
-            <div class="amount">{{ handleTag() }}</div>
-            <div class="theme">金额</div>
+            <div class="type">类型</div>
+            <div class="amount">已还金额（元）</div>
+            <div class="amount">累计返现（元）</div>
           </div>
-          <van-list v-model="isupLoading" :finished="finished" finished-text="" @load="onLoad">
+          <van-list v-model="isupLoading" :finished="finished" finished-text="没有更多了" @load="onLoad">
             <ul class="cash_list" v-if="profit.length>0">
-              <li class="cash_item van-hairline--bottom" v-for="item in profit" :key="item.id">
-                <div class="type">{{ item.createTime }}</div>
-                <div class="amount">{{ handleType(item) }}</div>
-                <div class="theme">+{{ item.amount }}</div>
+              <li class="cash_item van-hairline--bottom" v-for="(item,index) in profit" :key="index">
+                <div class="type">{{ item.description }}</div>
+                <div class="amount">{{ item.tradeAmount |toFixed }}</div>
+                <div class="theme amount">{{ item.rebate }}</div>
               </li>
             </ul>
-            <van-empty  v-else description="暂无记录">
-                     
+            <van-empty class="user_empty" v-else
+                       description="还没有获得返现 请前去立即推广哦">
+              <van-button round @click="next('/sharePage','8')" class="bottom-button theme-linear-bg color_fff ">
+                立即推广
+              </van-button>
             </van-empty>
           </van-list>
         </div>
+
       </div>
     </van-pull-refresh>
   </div>
@@ -52,11 +56,6 @@ export default {
       brandId: localStorage.getItem('brandId'),
       userId: localStorage.getItem('userId'),
       phone: localStorage.getItem('phone'),
-      form: {
-        types: [1, 11],
-        page: 0,
-        size: 20
-      },
       isLoading: false,
       yearList: [],
       yaer: '',
@@ -71,8 +70,8 @@ export default {
       profit: [],
       isupLoading: false,
       finished: false,
-      type: 0
-    }
+      size: 20
+    };
   },
   components: {
     [NavBar.name]: NavBar,
@@ -85,18 +84,8 @@ export default {
     [Button.name]: Button
   },
   created() {
-    this.type = this.$route.params.type
-    switch (this.type) {
-      case 0:
-        this.form.types = [0]
-        break;
-      case 10:
-        this.form.types = [10]
-        break;
-      default:
-        this.form.types = [1, 11]
-    }
     this.getData()
+    this._userDirectDetailQuery()
   },
   methods: {
     onClickLeft() {
@@ -105,7 +94,7 @@ export default {
     getData() {
       var d = new Date(), nowYear = d.getFullYear(), month = d.getMonth() + 1;
       this.yaer = nowYear
-      if (month < 10) {
+      if (month <= 9) {
         month = '0' + (month)
       }
       this.month = month
@@ -116,18 +105,29 @@ export default {
       ]
     },
     dateChange() {
-      // this._userDirectDetailQuery()
+      this._userDirectDetailQuery()
     },
     next(path, type) {
       this.$router.push({path: path});
     },
     _userDirectDetailQuery() {
-      userDirectDetailQuery(this.form).then(res => {
+      userDirectDetailQuery(String(this.yaer) + String(this.month), '1', this.queryType, this.size).then(res => {
         if (res.resp_code == '000000') {
-          this.isupLoading = false;
-          this.profit.push(...res.result.content)
-          if (res.result.last) {
-            this.finished = true;
+          if (res.result.length > 0) {
+            this.profit = res.result
+            this.isupLoading = false;
+            if (this.profit.length == this.size) {
+              this.finished = false;
+            } else if (this.size > this.profit.length) {
+              this.finished = true;
+            } else {
+              this.finished = true;
+            }
+            this.size += 10
+          } else {
+            this.profit = [];
+            this.finished = true
+            this.isupLoading = true;
           }
         }
       })
@@ -142,45 +142,12 @@ export default {
     },
     onLoad() {  //上啦加载
       setTimeout(() => {
-        this.form.page += 1
         this._userDirectDetailQuery()
       }, 500);
-    },
-    handleTag() {
-      switch (this.type) {
-        case 1:
-          return '类型'
-        default:
-          return '用户'
-      }
-    },
-    handleTitle() {
-      switch (this.type) {
-        case 1:
-          return '自用返现记录'
-        case 10:
-          return '直推首还奖'
-        default:
-          return '直推激活奖'
-      }
-    },
-    handleType(data) {
-      if(this.type == 1){
-        switch (data.type) {
-          case 1:
-            return '快捷刷卡'
-          case 11:
-            return '余额还款'
-          default:
-            return '未知'
-        }
-      }else{
-        return data.sourceName.substring(0,1)+'*'+data.sourceName.substring(data.sourceName.length-1) +
-          '（'+data.sourcePhone.substring(0,3)+'****'+data.sourcePhone.substring(data.sourcePhone.length-4)+'）'
-      }
     }
   }
-}
+};
+
 </script>
 <style scoped>
 .agent_nav >>> .van-nav-bar__title.van-ellipsis {
@@ -233,14 +200,10 @@ export default {
 }
 
 .cash_title .type {
-  width: 120px;
+  width: 140px;
 }
 
-.amount {
-  flex: 2;
-}
-
-.theme {
+.cash_title .amount {
   flex: 1;
 }
 
@@ -261,7 +224,11 @@ export default {
 }
 
 .cash_item .type {
-  width: 120px;
+  width: 140px;
+}
+
+.cash_item .amount {
+  flex: 1;
 }
 
 </style>

@@ -28,7 +28,7 @@ export default {
       show: false,
       token: '',
       userInfo: {},
-    };
+    }
   },
   components: {
     [NavBar.name]: NavBar,
@@ -45,7 +45,6 @@ export default {
       if (e === 'confirm') {
         if (this.userInfo.nickname) {
           setUsernickName(this.userInfo.nickname).then(res => {
-
             if (res.resp_code === '000000') {
               this.$toast({message: res.resp_message, position: 'bottom'})
             }
@@ -55,7 +54,6 @@ export default {
           this.$toast({message: '昵称不能为空', position: 'bottom'})
           dene(false)
         }
-
       } else if (e === 'cancel') {
         dene()
       }
@@ -98,9 +96,10 @@ export default {
           this.$toast({message: res.resp_message, position: 'bottom'})
         }
       })
-    }
+    },
   }
 }
+
 </script>
 <style scoped>
 .main {

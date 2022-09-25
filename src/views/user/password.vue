@@ -66,9 +66,10 @@ export default {
         name: 'smsSend',
         params: {phone: JSON.stringify(this.phone), password: JSON.stringify(this.password)}
       })
-    }
+    },
   }
 }
+
 </script>
 <style scoped>
 .main {

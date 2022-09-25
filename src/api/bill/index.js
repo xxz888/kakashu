@@ -35,7 +35,7 @@ export function bankIconQuery() {
       method: 'get',
     })
   }
-
+  
 
 
 /** 查询用户交易卡号  post */
@@ -73,11 +73,14 @@ export function cardRecordsNew(data) {
 }
 
 /** 获得plantype为1的计划详情 post */
-export function getPlanNew(params) {
+export function getPlanNew(planId,empowerToken) {
     return request({
         url: '/creditcardmanager/app/balance/plan/get',
         method: 'post',
-        params
+        data:qs.stringify({
+         planId,
+         empowerToken
+        })
     })
 }
 
@@ -97,10 +100,16 @@ export function repaymentOrderDetailQuery(brandId,userId,orderType,bankCard,star
 }
 
 /** 快捷查询用户交易明细  post */
-export function quickOrderQuery(params) {
+export function quickOrderQuery(brandId,userId,year,month,size) {
     return request({
         url: '/paymentgateway/app/quick/order/list',
         method: 'post',
-        params
+        data:qs.stringify({
+            "brandId":brandId,//品牌id
+            "userId":userId,//用户id
+            "year":year,//年
+            "month":month,//月
+            "size":size
+        })
     })
 }

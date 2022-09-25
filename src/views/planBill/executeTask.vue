@@ -11,8 +11,7 @@
                 <div class="card_icon_box">
                   <img
                     class="card_icon"
-                    :src="require('../../assets/bankIcon/BANK_'+item.logimg+'.png')"
-                  />
+                    :src="require('../../assets/bankIcon/BANK_'+item.logimg+'.png')"/>
                 </div>
               </van-col>
               <van-col span="20" class="card_bank">
@@ -85,7 +84,7 @@
                 <span v-if="item.type=='10'">-{{ Number(item.realAmount)  | toFixed }}</span>
                 <span v-else>
                   <span v-if="item.taskStatus==1 && item.orderStatus==1">
-                    +{{Number(item.realAmount) | toFixed }}
+                    +{{ Number(item.realAmount) | toFixed }}
                   </span>
                   <span v-else>+{{ Number(item.amount)  | toFixed }} </span>
                 </span>
@@ -129,6 +128,7 @@
                   <div>计划手续费：<span class="task_detail_item_right">{{ taskDetailItem.totalServiceCharge }}</span></div>
                 </van-col>
                 <van-col span="14">
+                  <!-- <div>计划费率：<span class="task_detail_item_right">{{Number(taskDetailItem.rate)*100 |toFixed }}%</span></div> -->
                   <div>计划费率：<span class="task_detail_item_right">0.85%</span></div>
                 </van-col>
               </van-row>
@@ -168,7 +168,10 @@
           </div>
         </div>
       </div>
-      <van-empty description="暂无数据" v-if="maintaskList.newResult==undefined || maintaskList.newResult.length==0" />
+
+      <!-- <img class="totalservicecharge_mask" v-if="totalServiceChargeTrueFalseBy" src="../../assets/plan_totalservicecharge.png" alt="" @click="totalServiceChargeTrueFalseBy=false" >  -->
+      <van-empty description="暂无数据" v-if="maintaskList.newResult==undefined || maintaskList.newResult.length==0">
+      </van-empty>
     </div>
     <diyconfirm ref="confirm" src='../../assets/alert.png' but='1'
                 zi='点“确定”删除后将不再执行“待执行”计划,如需执行请重新安排' @disconfirm='delplanone'/>
@@ -176,6 +179,7 @@
                   :orderCode="orderCode"></verification>
     <confirmorcancel ref="Dialog" src='../../assets/alert2.png' but='2'
                      :zi='start' @smsConfirm='smsConfirm' @getCode='getCode()' :message='message' @topClose='topClose'/>
+
   </div>
 </template>
 <script>
@@ -285,7 +289,7 @@ export default {
       channelTags: '',
       message: '获取验证码',
       start: '为保障用户还款时的多元化场景，更有利于养卡提额，建立一个还款多元化消费、多通道介入机制和即时切换机制，请您确认是否体验此功能',
-    }
+    };
   },
   components: {
     [NavBar.name]: NavBar,
@@ -293,7 +297,6 @@ export default {
     [Col.name]: Col,
     [PullRefresh.name]: PullRefresh,
     verification,
-    // nodata,
     [Empty.name]: Empty,
     [Button.name]: Button,
     diyconfirm,
@@ -370,7 +373,7 @@ export default {
             }
           })
         }
-      })
+      });
     },
     gettaskbil() {
       cardIsuserable(this.item.userId, this.item.brandId, this.item.creditCardNumber, this.item.version).then(res => {
@@ -455,7 +458,6 @@ export default {
         }
       })
     },
-
     _channelBind() { //是否绑定多通道
       isChannelBind(this.card.cardNo, this.card.idcard, this.card.phone, this.card.userName, this.card.userName, this.card.expiredTime, this.card.securityCode, this.card.cardNo, this.card.phone, this.card.userName, this.card.phone).then(res => {
         if (res.result == null || res.result == undefined || res.resp_message == '通道都已绑定!') {

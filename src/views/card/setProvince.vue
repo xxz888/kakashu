@@ -43,7 +43,6 @@
 import {NavBar, Cell, CellGroup, Field, Picker, Popup, Button, Area, Icon} from 'vant';
 import {setBankInfo} from '@/api/card/card'
 import areaList from '@/components/area'
-import lrz from 'lrz'
 
 export default {
   data() {

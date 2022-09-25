@@ -10,18 +10,16 @@
                      readonly="readonly"></van-field>
           <van-field v-model="authorityList.result.securityCode" label="安全码" maxlength="3" readonly="readonly"
                      placeholder="请输入(卡背面CVN2后三位数字)" clearable>
-            <!-- <van-icon name="question" slot="right-icon"  @click="codeTrueFalseBy=true" /> -->
           </van-field>
           <van-field v-model="authorityList.result.expiredTime" label="有效期" maxlength="4" readonly="readonly"
                      placeholder="请输入(如09/22输入0922)" clearable/>
           <van-field v-model="authorityList.result.phone" label="手机号" placeholder="请输入银行卡预留手机号" readonly="readonly"
                      clearable maxlength="11">
-            <!-- <van-icon name="question" slot="right-icon"  @click="phoneTrueFalseBy=true"    /> -->
           </van-field>
-          <van-field v-model="smsCode" center type="digit" clearable label="短信验证码" placeholder="请输入短信验证码">
+          <van-field v-model="smsCode" center type="digit" clearable
+                     label="短信验证码" placeholder="请输入短信验证码">
             <template #button>
-              <van-button size="small" plain type="danger" @click="message == '获取验证码' ? getCode() : ''">
-                {{ message }}
+              <van-button size="small" plain type="danger" @click="message == '获取验证码' ? getCode() : ''">{{ message }}
               </van-button>
             </template>
           </van-field>
@@ -36,8 +34,7 @@
 </template>
 <script>
 import {NavBar, Cell, CellGroup, Field, Picker, Popup, Button, Icon} from 'vant';
-import confirmorcancel from '@/components/confirm/alert'
-import {creditcardSaveTask, isChannelBind, balanceSaveEmptyCard, buildChannel} from "@/api/plan/plan";
+import {creditcardSaveTask, balanceSaveEmptyCard, buildChannel} from "@/api/plan/plan";
 import request from '@/utils/request'
 import qs from 'qs'
 
@@ -57,6 +54,7 @@ export default {
       num2: 60,
       message2: '获取验证码',
       channelactive: {},
+
       authorityList: {
         result: {
           bankCard: "",
@@ -85,6 +83,7 @@ export default {
     [Button.name]: Button,
     [Icon.name]: Icon
   },
+  computed: {},
   created() {
     this.authorityList = JSON.parse(this.$route.params.authorityList)
     this.item = JSON.parse(this.$route.params.item)
@@ -228,12 +227,15 @@ export default {
           }
         })
       } else if (this.isold == 2) {
+
         this.$store.commit('Loading')
-        buildChannel(this.item.userId, this.task.creditCardNumber).then(res => {
+        buildChannel({'userId':this.item.userId, 'creditCardNumber':this.task.creditCardNumber}).then(res => {
+          this.publicJs.output(res, "验证用户是否需要绑卡接口")
           this.$store.commit('closeLoading')
           if (res.resp_code == '000000') {
             let extra = JSON.parse(this.extra).merprovince + '-' + JSON.parse(this.extra).mercity + '-' + JSON.parse(this.extra).provinceId.split(',')[0] + '-' + JSON.parse(this.extra).cityCode.split(',')[0]
             balanceSaveEmptyCard(this.item.userId, this.task.creditCardNumber, extra).then(res => {
+              this.publicJs.output(res, "执行计划")
               this.$store.commit('closeLoading')
               if (res.resp_code == '000000') {
                 this.$router.push({
@@ -264,7 +266,6 @@ export default {
             window.location.href = res.result
           } else if (res.resp_code == '999992') {
             this.authorityList = res
-            // this.$router.push({name:'confirmPlan',params:{authorityList: JSON.stringify(res),item: JSON.stringify(this.item),task: JSON.stringify(this.task),extra:this.extra}})
             this.$router.go(-1)
           }
         })
@@ -337,6 +338,7 @@ export default {
           }, 1000)
           this.$toast({message: '验证码发送成功,请注意查收', position: 'bottom'})
         }
+
       })
     },
     topClose() {  //点击 x 跳转到信用卡列表
@@ -351,7 +353,7 @@ export default {
           'type': 'h5',
           'deviceId': localStorage.getItem('deviceId')
         }
-      })
+      });
     }
   }
 };

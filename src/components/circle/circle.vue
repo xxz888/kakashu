@@ -1,12 +1,9 @@
 <template>
-  <!-- <div>awsssssome</div> -->
-  <canvas ref="canvasDemo"
-          :width="canvasSize"
-          :height="canvasSize" />
+  <canvas ref="canvasDemo" :width="canvasSize" :height="canvasSize" />
 </template>
 
 <script>
-// 参考于https://github.com/cumt-robin/vue-awesome-progress/blob/master/src/components/level.vue
+// 参考于https://github.com/cumt-robin/vue-awesome-progress/blob/master/src/components/index.vue
 import BezierEasing from "bezier-easing";
 export default {
   name: "awesomeProgress",
@@ -53,15 +50,15 @@ export default {
     },
     lineColor: {
       type: String,
-      default: '#4cc566'
+      default: '#9B3C9D'
     },
     // 渐变色的数组
     lineColorStops: {
       type: Array,
       default: function () {
         return [
-          { percent: 0, color: '#4cc566' },
-          { percent: 1, color: '#4cc566' }
+          { percent: 0, color: '#9B3C9D' },
+          { percent: 1, color: '#9B3C9D' }
         ]
       }
     },
@@ -75,7 +72,7 @@ export default {
     },
     fontColor: {
       type: String,
-      default: '#4cc566'
+      default: '#9B3C9D'
     },
     // 进度圆小球上的半径
     pointRadius: {
@@ -85,7 +82,7 @@ export default {
     // 进度圆小球上的颜色
     pointColor: {
       type: String,
-      default: '#4cc566'
+      default: '#9B3C9D'
     },
     // 是否启用动画
     animated: {
@@ -133,10 +130,6 @@ export default {
     initCanvas () { // 初始化canvas
       let canvas = this.$refs.canvasDemo;
       let ctx = canvas.getContext("2d");
-      // https://developer.mozilla.org/zh-CN/docs/Web/API/CanvasRenderingContext2D/createLinearGradient
-      // if (this.useGradient) {
-      //   this.gradient = ctx.createLinearGradient()
-      // }
       const endDeg = this.getTargetDegByPercentage(this.startDeg, this.percentage) // 求出结束的圆弧点
       if (this.useGradient) {
         this.gradient = ctx.createLinearGradient(this.circleRadius, 0, this.circleRadius, this.circleRadius * 2);

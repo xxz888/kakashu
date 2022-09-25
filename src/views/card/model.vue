@@ -16,6 +16,7 @@
           </li>
         </ul>
       </van-row>
+
       <nocard></nocard>
     </div>
   </div>
@@ -32,7 +33,7 @@ import {
   SwipeCell,
   Button,
   Popup,
-} from "vant"
+} from "vant";
 import nocard from "@/components/nodata/nodata";
 
 export default {
@@ -56,7 +57,7 @@ export default {
       type: "h5",
       helpTrueFalseBy: false,
       hphone: {}
-    };
+    }
   },
   components: {
     [NavBar.name]: NavBar,
@@ -109,7 +110,7 @@ export default {
       } catch (e) {
         window.webkit.messageHandlers.iosWebKit.postMessage('goroothome');
       }
-    }
+    },
   }
 };
 </script>
@@ -315,7 +316,7 @@ export default {
 }
 
 .plan_status.two {
-  color: #F63802;
+  color: #9B3C9D;
 }
 
 .plan_status.one {

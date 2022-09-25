@@ -37,6 +37,7 @@
           <input name="userId" :value="userId" style="display:none" type="text" id="userId"/>
         </form>
       </div>
+
       <div class="tishi"></div>
       <ul class="tip">
         <li>请保证您的年龄符合18-80周岁</li>
@@ -83,52 +84,49 @@ export default {
   components: {
     [NavBar.name]: NavBar,
   },
+  async created() {
+  },
   methods: {
     onClickLeft() {
       this.publicJs.back();
     },
     chooseFile(index, e) {
-      var self = this
       var file = e.target.files[0];
-      lrz(file, self.config).then(rst => {
-          if (Number(index) == 1) {
-            // debugger
-            self.img1.urlinfo = rst.base64;
-            self.img1.urlshow = true;
-            if (file.size < 500000) {
-              self.img1.file = file
-            } else {
-              self.img1.file = rst.file;
-            }
-            self.anew_one = true;
-            self.imgz = window.URL.createObjectURL(e.target.files[0])
-          } else if (Number(index) == 2) {
-            self.img2.urlinfo = rst.base64;
-            self.img2.urlshow = true;
-            if (file.size < 500000) {
-              self.img2.file = file
-            } else {
-              self.img2.file = rst.file;
-            }
-            self.anew_two = true;
-            self.imgf = window.URL.createObjectURL(e.target.files[0])
-          } else if (Number(index) == 3) {
-            self.img3.urlinfo = rst.base64;
-            self.img3.urlshow = true;
-            if (file.size < 500000) {
-              self.img3.file = file
-            } else {
-              self.img3.file = rst.file;
-            }
-            self.anew_two = true;
-            self.imgs = window.URL.createObjectURL(e.target.files[0])
+      lrz(file, this.config).then(rst => {
+        if (Number(index) == 1) {
+          this.img1.urlinfo = rst.base64;
+          this.img1.urlshow = true;
+          if (file.size < 500000) {
+            this.img1.file = file
+          } else {
+            this.img1.file = rst.file;
           }
-        }).catch(err => {
-          this.$toast({message: '上传失败，请重新上传', position: 'bottom'});
-        }).always(() => {
-          // 清空文件上传控件的值
-          e.target.value = null
-        })
+          this.imgz = window.URL.createObjectURL(e.target.files[0])
+        } else if (Number(index) == 2) {
+          this.img2.urlinfo = rst.base64;
+          this.img2.urlshow = true;
+          if (file.size < 500000) {
+            this.img2.file = file
+          } else {
+            this.img2.file = rst.file;
+          }
+          this.imgf = window.URL.createObjectURL(e.target.files[0])
+        } else if (Number(index) == 3) {
+          this.img3.urlinfo = rst.base64;
+          this.img3.urlshow = true;
+          if (file.size < 500000) {
+            this.img3.file = file
+          } else {
+            this.img3.file = rst.file;
+          }
+          this.imgs = window.URL.createObjectURL(e.target.files[0])
+        }
+      }).catch(err => {
+        this.$toast({message: '上传失败，请重新上传', position: 'bottom'});
+      }).always(() => {
+        // 清空文件上传控件的值
+        e.target.value = null
+      })
     },
     getFilez(e) {
       this.imgz = window.URL.createObjectURL(e.target.files[0])
@@ -159,7 +157,6 @@ export default {
     },
     reduceImg() {
       var file = $("#idcardz")[0].files[0];
-      let value = ''
       //压缩formData图片文件上传
       lrz(file, {width: 1024, fieldName: 'faceFile'}).then(rst => {
         this.fileData = rst.formData
@@ -179,6 +176,7 @@ export default {
         return
       }
       this.$store.commit('Loading')
+
       let param = new FormData() // 创建form对象
       param.append('idCardTop', this.img1.file) // 通过append向form对象添加数据
       param.append('idCardBack', this.img2.file)
@@ -190,9 +188,10 @@ export default {
           this.$router.push({name: 'depositCardAdd'})
         }
       })
-    }
+    },
   }
 }
+
 </script>
 <style scoped>
 .main {

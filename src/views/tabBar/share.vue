@@ -78,7 +78,7 @@
               <li class="cell_item van-hairline--bottom" @click="$router.push({name:'kadeChina'})">
                 <div class="left">
                   <img src="../../assets/share/join_icon.png" alt="">
-                  <span>八色生活</span>
+                  <span>咔咔鼠</span>
                 </div>
                 <div class="icon">
                   <van-icon class="icon_icon" size="16" name="arrow"/>
@@ -107,6 +107,7 @@
             </ul>
           </div>
         </div>
+
       </div>
     </van-pull-refresh>
     <div class="tabbar_p"></div>
@@ -144,7 +145,7 @@ export default {
     [NavBar.name]: NavBar,
     [PullRefresh.name]: PullRefresh,
     [Icon.name]: Icon,
-    tabbar
+    tabbar,
   },
   created() {
     this._getBrandFalseDate()
@@ -152,11 +153,12 @@ export default {
   },
   methods: {
     _newsQuery(type) {
-      newsQuery(this.global.brandId, '功能跳转').then(res => {
-        if (res.resp_code == '000000') {
-          this.fuwuList = res.result.content
-        }
-      })
+      newsQuery(this.global.brandId, '功能跳转')
+        .then(res => {
+          if (res.resp_code == '000000') {
+            this.fuwuList = res.result.content
+          }
+        })
     },
     _getBrandFalseDate() {
       getBrandFalseDate(this.global.brandId).then(res => {
@@ -206,7 +208,8 @@ export default {
       if (type == 8) {
         this.$router.push({path: path});
       } else if (type == 1) {
-        this.$router.push({path: path,
+        this.$router.push({
+          path: path,
           query: {
             'phone': this.phone,
             'token': this.token,
@@ -229,7 +232,8 @@ export default {
       }, 1000);
     }
   }
-}
+};
+
 </script>
 <style scoped>
 .tabbar_p {

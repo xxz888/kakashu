@@ -12,10 +12,10 @@
               <div class="img" :class="item.img_url.length % 2 == 0 ? 'mgr':''" v-for="(img,j) in item.img_url"
                    :key="j+'itm'">
                 <span v-if="img.indexOf('?')>-1">
-                  <img :src="img+'&token='+token" alt="" @click="showImag(item,j)">
+                  <img :src="img+'&token='+token" id="imageWrapper" alt="" @click="showImag(item,j)">
                 </span>
                 <span v-else>
-                  <img :src="img" alt="" @click="showImag(item,j)">
+                  <img :src="img" alt="" id='imageWrapper' @click="showImag(item,j)">
                 </span>
               </div>
             </div>
@@ -29,12 +29,17 @@
         </div>
       </van-pull-refresh>
     </div>
+
     <div class="main" v-else>
       <van-empty image="error" description="暂无数据"/>
     </div>
     <div class="page">
-      <van-pagination v-model="currentPage" :total-items="totalElements" :items-per-page="20" force-ellipses
-                      @change="getMessage(currentPage-1)"/>
+      <van-pagination
+        v-model="currentPage"
+        :total-items="totalElements"
+        :items-per-page="20"
+        force-ellipses
+        @change="getMessage(currentPage-1)"/>
     </div>
   </div>
 </template>
@@ -42,7 +47,7 @@
 <script>
 import {imagetextQuery1,} from '@/api/showBrand'
 import {NavBar, PullRefresh, ImagePreview, Empty, Icon, Pagination} from 'vant';
-
+import html2canvas from 'html2canvas'
 export default {
   data() {
     return {
@@ -76,7 +81,6 @@ export default {
     // 下拉刷新
     onRefresh() {
       setTimeout(() => {
-        // this.$toast('刷新成功');
         this.getMessage(this.currentPage - 1)
         this.isLoading = false;
       }, 1000);
@@ -93,7 +97,6 @@ export default {
     },
     showImag(item, i) {
       let images = []
-      // this.show = true
       item.img_url.forEach(item => {
         if (item.indexOf('?') > -1) {
           item = item + '&token=' + this.token
@@ -102,7 +105,8 @@ export default {
       });
       ImagePreview({images, startPosition: i})
     },
-    copyShaneUrl(shareLink) {
+     copyShaneUrl(shareLink) {
+      
       var input = document.createElement("input");     // 直接构建input
       input.value = shareLink;   // 设置内容
       document.body.appendChild(input);        // 添加临时实例
@@ -110,11 +114,10 @@ export default {
       document.execCommand("Copy");     // 执行复制
       document.body.removeChild(input);  // 删除临时实例
       var title = "分享内容已复制，请打开图片进行长按保存"
-
       this.$toast({message: title, position: 'bottom'})
-    },
+    }
   },
-
+   
 }
 
 </script>

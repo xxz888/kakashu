@@ -23,7 +23,6 @@ export default {
     modality(x = 20, y = 70, w = 100, h = 80) {
       var height = document.documentElement.clientHeight;
       var width = document.documentElement.clientWidth;
-
       //上面的遮罩
       var div1 = document.createElement('div');
       div1.style.left = '0px';
@@ -34,7 +33,6 @@ export default {
       div1.style.backgroundColor = 'rgba(100,100,100,0.3)'
       div1.style.zIndex = ' 5000'
       document.body.append(div1);
-
       //下面的遮罩
       var div2 = document.createElement('div')
       div2.style.left = '0px';
@@ -45,7 +43,6 @@ export default {
       div2.style.zIndex = '2000'
       div2.style.backgroundColor = 'rgba(100,100,100,0.3)'
       document.body.append(div2);
-
       //左边的遮罩
       var div3 = document.createElement('div')
       div3.style.left = '0px';
@@ -56,7 +53,6 @@ export default {
       div3.style.zIndex = '2000'
       div3.style.backgroundColor = 'rgba(100,100,100,0.3)'
       document.body.append(div3);
-
       //右边的遮罩
       var div4 = document.createElement('div')
       div4.style.left = x + w + 'px';

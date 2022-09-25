@@ -6,10 +6,10 @@ import getters from './getters'
 Vue.use(Vuex)
 
 const store = new Vuex.Store({
-  modules: {
-    user: user,
-  },
-  getters,
+    modules: {
+        user:user,
+    },
+    getters,
 
 })
 
@@ -29,6 +29,7 @@ const store = new Vuex.Store({
 //     },
 //     getters
 // })
+
 
 
 export default store;

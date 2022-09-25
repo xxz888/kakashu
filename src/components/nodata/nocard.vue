@@ -3,7 +3,8 @@
     <div class="nodata">
       <div class="nodata_img"></div>
       <div class="nodata_title color_999">暂无银行卡</div>
-      <x-button class="selectcard_nodata_add" style="border-radius:99px" @click.native="gonext('addcard')">添加银行卡
+      <x-button class="selectcard_nodata_add" style="border-radius:99px" @click.native="gonext('addcard')">
+        添加银行卡
       </x-button>
     </div>
   </div>

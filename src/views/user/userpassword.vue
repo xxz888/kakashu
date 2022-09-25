@@ -1,11 +1,11 @@
 <!-- 忘记密码 -->
 <template>
   <div>
-    <van-nav-bar title="修改登录密码" left-text="" left-arrow fixed @click-left="onClickLeft" right-text="客服"
+    <van-nav-bar :title="'修改登录密码'" left-text="" left-arrow fixed @click-left="onClickLeft" right-text="客服"
                  @click-right="onClickRight"/>
     <div class="main">
       <div class="input_item">
-        <van-field clearable label="手机号" v-model="phone" type="number" placeholder="请输入手机号" maxlength="11"/>
+        <van-field clearable label="手机号" v-model="phone" type="number" :placeholder="'请输入手机号'" maxlength="11"/>
       </div>
       <div class="input_item">
         <van-field clearable label="新密码" v-model="password" type="password" :placeholder="'请输入'+title+'密码'"/>
@@ -43,7 +43,7 @@ export default {
       message: "发送验证码",
       brandId: this.global.brandId,
       num: 60
-    }
+    };
   },
   components: {
     [NavBar.name]: NavBar,
@@ -87,7 +87,6 @@ export default {
         this.$toast({message: '请输入密码', position: 'bottom'})
         return
       }
-
       if (this.passsure == '') {
         this.$toast({message: '确认密码不能为空', position: 'bottom'})
         return
@@ -96,12 +95,11 @@ export default {
         this.$toast({message: '两次密码输入不一致', position: 'bottom'})
         return
       }
-
       updatepassword(this.phone, this.msm, this.password, this.brandId).then(res => {
         if (res.resp_code == '000000') {
           this.$toast({message: '密码修改' + res.resp_message + '请重新登录', position: 'bottom'})
           let did = localStorage.getItem('did')
-          localStorage.clear()
+          localStorage.clear();Cookies.remove('token');
           if (did)
             localStorage.setItem('did', did)
           this.$router.push({name: 'login'})
@@ -134,6 +132,6 @@ export default {
 }
 
 .sms {
-  color: #f63802;
+  color: #9B3C9D;
 }
 </style>

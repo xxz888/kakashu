@@ -25,7 +25,7 @@ export default {
       brandId: this.global.brandId,
       isLoading: false,
       wechatList: []
-    };
+    }
   },
   components: {
     [NavBar.name]: NavBar,
@@ -55,6 +55,7 @@ export default {
     }
   }
 }
+
 </script>
 <style scoped>
 .wechat_box {

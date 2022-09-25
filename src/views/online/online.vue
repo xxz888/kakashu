@@ -14,6 +14,7 @@
             <van-field class="money_input" :value="money" placeholder="请输入金额，最低100元" readonly/>
           </div>
         </div>
+
         <div class="cardItem">
           <span>支付信用卡：</span>
           <div v-if="defDaiCardList.length > 0">
@@ -42,15 +43,8 @@
           </div>
           <span class="set" @click="seleDefCard(1)">更换 ></span>
         </div>
-        <div style="color:#999;font-size:13px;line-height:20px;">
-          <p>大额费率：0.65%（每1万元65元手续费）+2元/次</p>
-          <p>您是 <span style="color:red">{{ level.levelName }}</span> 用户，每1万元可以返 <span
-            style="color:red">{{ handleAmount(1) }} </span> 元</p>
-          <br>
-          <p>小额费率：0.45%（每1万元45元手续费）+2元/次</p>
-          <p>您是 <span style="color:red">{{ level.levelName }} </span>用户，每1万元可以返 <span
-            style="color:red">{{ handleAmount(0) }} </span>元</p>
-        </div>
+
+        <div style="color:red">温馨提示：为了避免银行风控，收款金额不要输入整数（1000）、豹子数（666）、顺子数（123）、尾数不要常是0,6,8,9，同一张卡连续收款间隔至少2小时以上</div>
       </div>
     </div>
 
@@ -142,7 +136,7 @@ export default {
   created() {
     this.userId = localStorage.getItem('userId')
     this.phone = localStorage.getItem('phone')
-    this.getLevelPage()
+    // this.getLevelPage()
     this.getCard(0, 0, 1)
     this.getCard(2, 2, 1)
     this._newsQuery()
@@ -570,7 +564,7 @@ export default {
 }
 
 .online_keyboard >>> .van-key--blue {
-  background: #3AC461;
+  background: #9B3C9D;
 }
 
 .money_input >>> .van-field__control::-webkit-input-placeholder {

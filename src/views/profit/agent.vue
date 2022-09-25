@@ -46,7 +46,7 @@
                 </div>
                 <div class="cont" @click="repayment(item)">
                   <div class="title" v-if="item.fullname == null">
-                    未实名<span class="tips"> {{ "(" + item.phon + ")" }}</span>
+                    未实名<span class="tips"> {{ "(" + item.phone + ")" }}</span>
                   </div>
                   <div class="title" v-else>
                     {{ item.fullname }}
@@ -54,6 +54,11 @@
                   </div>
                   <span class="tips">{{ item | agentStatus }}</span>
                 </div>
+
+
+
+
+                
                 <div class="right">
                   <div class="phone">
                     <a :href="'tel:' + item.phone">
@@ -207,7 +212,7 @@ export default {
     repayment(item) {
       empowerToken(item.id).then((res) => {
         if (res.resp_code == "000000") {
-          if (res.resp_message == "获取成功" || res.resp_message == "操作成功") {
+          if (res.resp_message == "获取成功") {
             this.$router.push({
               name: "creditcard",
               query: { empowerToken: res.result },
@@ -357,7 +362,7 @@ export default {
 .userStatus_4 {
   border: 1px solid #ffaf78;
   background: #ffefdd;
-  color: #4cc566;
+  color: #9B3C9D;
 }
 
 .profit_user_item .right {
@@ -446,7 +451,7 @@ export default {
 
 .agent_grade_name {
   display: inline-block;
-  background: #4cc566;
+  background: #9B3C9D;
   border-radius: 9px;
   padding: 0 8px;
   font-size: 11px;
@@ -488,7 +493,7 @@ export default {
 }
 
 .activeStatus {
-  background: #4cc566;
+  background: #9B3C9D;
   color: #fff;
 }
 .add_btn {

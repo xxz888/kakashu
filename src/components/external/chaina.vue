@@ -3,7 +3,6 @@
     <div class="map-service">
       <div class="map-service-right">
         <div class="china-map">
-
           <div class="region-list active postition-1 online-node">
             <div class="area-box"><span class="dot"></span><span class="pulse delay-01"></span>
               <span class="pulse delay-02"></span>
@@ -64,14 +63,12 @@
               <span class="pulse delay-05"></span></div>
             <div class="show-regin"><span>四川</span></div>
           </div>
-
           <div class="region-list  postition-11 online-node">
             <div class="area-box"><span class="dot"></span><span class="pulse delay-11"></span>
               <span class="pulse delay-09"></span>
               <span class="pulse delay-05"></span></div>
             <div class="show-regin"><span>湖北</span></div>
           </div>
-
           <div class="region-list  postition-12 online-node">
             <div class="area-box"><span class="dot"></span><span class="pulse delay-1"></span>
               <span class="pulse delay-09"></span>
@@ -133,7 +130,7 @@ a, img {
 .china-map {
   width: 100%;
   height: 220px;
-  background: url('../../assets/map_black_bg.png') center no-repeat;
+  background: url('../../assets/kade/map_black_bg.png') center no-repeat;
   background-size: 300px 220px;
   position: absolute;
   left: 0px;

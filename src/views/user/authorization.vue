@@ -16,8 +16,8 @@
         </ul>
       </div>
       <div class="tongyi ">
-        <label class="cha"> <input class="che" type="checkbox" v-model="acitve"> 勾选后，点击按钮即您同意</label><span
-        class="agreement" @click.stop="$router.push({name:'agreement'})">《用户信息授权协议》</span>并确认授权
+        <label class="cha"> <input class="che" type="checkbox" v-model="acitve"> 勾选后，点击按钮即您同意</label>
+        <span class="agreement" @click.stop="$router.push({name:'agreement'})">《用户信息授权协议》</span>并确认授权
       </div>
       <div class="submit make_plan_btn theme_btn color_fff" @click="submit">同意授权并继续</div>
     </div>
@@ -74,7 +74,7 @@ export default {
       } else {
         this.$toast({message: '请同意协议后继续', position: 'bottom'})
       }
-    }
+    },
   }
 }
 

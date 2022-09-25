@@ -6,7 +6,6 @@
       <div class="partner_item van-hairline--bottom" v-for="(item,i) in fuwuList" :key="i" @click="link(item)">
         <h6>{{ item.title }}</h6>
         <span class="theme_bg">#全部会员可见</span>
-        <!-- <span class="theme_bg" v-for="(itm,j) in gradeList" :key="j" v-if="itm.grade == item.onOff  && item.onOff != 0">#{{itm.name}}用户及以上可见</span> -->
         <img :src="item.lowSource" alt="">
         <div>
           <span>{{ item.createTime }}</span>
@@ -55,7 +54,6 @@ export default {
     // 下拉刷新
     onRefresh() {
       setTimeout(() => {
-        // this.$toast('刷新成功');
         this.getNewsList()
         this.isLoading = false;
       }, 1000);
@@ -66,13 +64,14 @@ export default {
     },
     // 获取平台新闻分类数据
     getNewsList() {
-      newsQuery(this.brandId, this.title).then(res => {
-        if (res.resp_code == '000000') {
-          this.fuwuList = res.result.content
-        } else {
-          this.$toast({message: res.resp_message, position: 'bottom'})
-        }
-      })
+      newsQuery(this.brandId, this.title)
+        .then(res => {
+          if (res.resp_code == '000000') {
+            this.fuwuList = res.result.content
+          } else {
+            this.$toast({message: res.resp_message, position: 'bottom'})
+          }
+        })
     },
     link(item) {
       this.$router.push({
@@ -82,10 +81,9 @@ export default {
     },
     gonext() {
       this.$router.push({name: this.cfg.up})
-    },
+    }
   }
 }
-
 </script>
 <style scoped>
 .zhanwei {

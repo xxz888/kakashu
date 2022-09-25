@@ -75,7 +75,7 @@ export default {
       this.$store.commit('Loading')
       if(this.params){
         balanceBindCard(this.params).then(res => {
-           if(res.resp_code == '000000'){
+            if(res.resp_code == '000000'){
               this.$toast({ message: '您已经绑过卡了', position: 'bottom' })
               listener.$emit('backFromBindCard', 1)
               history.back()
@@ -192,7 +192,7 @@ export default {
 }
 
 .box .bg {
-  background: url("../../assets/addcard/security_code.png") center no-repeat;
+  background: url("https://cader-install.oss-cn-shanghai.aliyuncs.com/backManage/addcard/security_code.png") center no-repeat;
   background-size: 100% 100%;
   height: 123px;
   width: 194px;

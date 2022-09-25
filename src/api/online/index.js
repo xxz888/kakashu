@@ -199,3 +199,10 @@ export function huabeiPayApi(data){
     data
   })
 }
+export function getVideoList(data){
+  return request({
+    url: '/user/app/vedio/list',
+    method: 'post',
+    data
+  })
+}

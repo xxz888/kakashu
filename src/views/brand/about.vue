@@ -6,8 +6,8 @@
     <van-pull-refresh v-model="isLoading" @refresh="onRefresh" loading-text="加载中...">
       <div class="about_box">
         <div class="about_item" v-for="(item,index) in aboutList" :key="index">
-          <img class="logo" src="../../assets/profit/logo.jpg" alt="">
-          <p>{{ item.pictureContent }}八色生活是行业领先的信用卡还款、刷
+          <img class="logo" src="@/assets/logo3.png" alt="">
+          <p>{{ item.pictureContent }}咔咔鼠是行业领先的信用卡还款、刷
             卡、办卡软件，空卡仅需留足手续费
             ，或5%以上的可用余额，即可全额快速还款，每万元手
             续费低至75元，让您彻底远离逾期；刷卡10秒内
@@ -16,8 +16,7 @@
         </div>
       </div>
       <div class="tel">
-        <p>浙江瀚德网络科技有限公司</p>
-        <p>电话：400-6666-085</p>
+        <p>咔咔鼠运营中心</p>
       </div>
     </van-pull-refresh>
 
@@ -97,7 +96,7 @@ export default {
 }
 
 .logo {
-  width: 180px;
-  margin: 0px 60px;
+  width: 120px;
+  margin: 0px 100px;
 }
 </style>

@@ -1,10 +1,8 @@
 <template>
-  <!-- <div class=""> -->
   <div class="nodata">
     <div class="nodata_img"></div>
     <div class="nodata_title color_999">暂无数据</div>
   </div>
-  <!-- </div> -->
 </template>
 
 <script>
@@ -27,8 +25,7 @@ export default {
 .nodata_img {
   width: 145px;
   height: 175px;
-  
-  background: url("../../assets/data_nodata.png") center no-repeat;
+  background: url("../../assets/card_nodata.png") center no-repeat;
   background-size: 100% 100%;
   margin: 0 auto;
 }

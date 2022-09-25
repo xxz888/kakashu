@@ -14,7 +14,7 @@
     <div class="tabs">
       <van-tabs
         v-model="active"
-        color="#4cc566"
+        color="#9B3C9D"
         line-width="20%"
         line-height="2px"
         @change="tab"
@@ -389,7 +389,7 @@ export default {
   height: 20px;
 }
 .userTitle {
-  color: #4cc566;
+  color: #9B3C9D;
 }
 .themeTitle {
   padding: 5px;

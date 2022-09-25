@@ -1,14 +1,18 @@
 <!-- 设置 -->
 <template>
   <div>
-    <van-nav-bar :title="'设置'" left-arrow fixed @click-left="onClickLeft"/>
+    <van-nav-bar :title="'设置'" left-arrow fixed @click-left="onClickLeft" right-text="刷新" @click-right="onClickRight"/>
     <div class="main">
       <van-cell-group>
-        <van-cell title="设置登录密码" :icon="require('../../assets/set/key_icon.png')" is-link to="userpassword">
+        <van-cell title="设置登录密码" 
+                  is-link to="userpassword">
         </van-cell>
-        <van-cell title="清理缓存" :icon="require('../../assets/set/clean.png')" @click="clean">
-        </van-cell>
-        <van-cell title="修改交易密码" :icon="require('../../assets/set/password_icon.png')" is-link to="password"/>
+        <van-cell title="修改交易密码"
+                   is-link
+                  to="password"/>
+          <van-cell title="修改登录手机"
+         is-link
+        to="changePhone"/>
       </van-cell-group>
       <div class="submit theme_btn_dark" @click="outLogin()">退出登录</div>
     </div>
@@ -18,6 +22,7 @@
 <script>
 import {NavBar, Cell, CellGroup, Dialog} from 'vant';
 import {brandQuery} from '@/api/showBrand'
+import Cookies from "js-cookie";
 
 export default {
   data() {
@@ -37,17 +42,12 @@ export default {
     this.getBrand()
   },
   methods: {
+    onClickRight(){
+      location.reload()
+    },
     onClickLeft() {
       window.history.back()
       return
-    },
-    clean() {
-      this.$store.commit('Loading')
-      let time = setTimeout(() => {
-        this.$store.commit('closeLoading')
-        this.$toast({message: '清除成功', position: 'bottom'})
-        clearTimeout(time)
-      }, 1000);
     },
     getBrand() {
       brandQuery(this.brandId).then(res => {
@@ -71,15 +71,22 @@ export default {
         title: '温馨提示',
         message: '确认要退出登录吗？'
       }).then(() => {
-        localStorage.clear()
+        let did = localStorage.getItem('did')
+        localStorage.clear();
         sessionStorage.clear()
+        if (did) {
+          localStorage.setItem('did', did)
+        }
+      Cookies.remove('token');
+
+            
         this.$router.push({name: 'login'})
       }).catch(() => {
-        // on cancel
       })
-    }
+    },
   }
 }
+
 </script>
 <style scoped>
 .main {
@@ -97,6 +104,5 @@ export default {
   font-size: 16px;
   color: #FFFFFF;
   box-shadow: 2px 3px 3px 0 rgba(130, 130, 130, .1);
-  background: #4cc566;
 }
 </style>

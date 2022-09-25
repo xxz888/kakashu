@@ -55,7 +55,7 @@
       </div>
     </div>
     <verification ref="verificationMethod" :authorityList="verificationList" :channelactive="channelactive"
-                  :orderCode="orderCode" :type="pageType"></verification>
+                  :orderCode="orderCode" :type="pageType"/>
   </div>
 </template>
 
@@ -102,14 +102,12 @@ export default {
   props: {
     item: {},
     type: {
-      type: Integer,
-      default: 0
+      type: String,
+      default: ''
     }
   },
   components: {
     verification,
-    // XInput,
-    // XButton,
   },
   created() {
     this.user_id = localStorage.getItem("userId");
@@ -130,7 +128,6 @@ export default {
             }
           });
           this.isDialog = this.$store.state.user.channelAuthDialog;
-          //   this.isDialog = true
         }
       });
     },
@@ -221,7 +218,6 @@ export default {
                 })
               }
             })
-
           })
         } else if (res.resp_code == "999989") {
           window.location.href =
@@ -374,7 +370,7 @@ export default {
 }
 
 .noAuth {
-  background: #4cc566;
+  background: #9B3C9D;
   color: #ffffff;
 }
 

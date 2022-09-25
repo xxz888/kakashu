@@ -11,7 +11,6 @@ NProgress.configure({
 })
 
 router.beforeEach((to, from, next) => {
-  // NProgress.start();
   if (to.meta.title) {
     document.title = to.meta.title
   }
@@ -28,6 +27,4 @@ router.beforeEach((to, from, next) => {
   }
 });
 router.afterEach(() => {
-  // 在即将进入新的页面组件前，关闭掉进度条
-  // NProgress.done()
 })

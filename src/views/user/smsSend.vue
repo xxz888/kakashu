@@ -41,7 +41,6 @@ export default {
   created() {
     this.phone = JSON.parse(this.$route.params.phone)
     this.password = JSON.parse(this.$route.params.password)
-    // this.getCode()
   },
   methods: {
     onClickLeft() {
@@ -83,9 +82,10 @@ export default {
           }
         })
       }
-    }
+    },
   }
 }
+
 </script>
 <style scoped>
 .main {

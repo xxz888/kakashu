@@ -1,7 +1,12 @@
 <!-- 更换通道 -->
 <template>
   <div>
-    <van-nav-bar :title="item.name" left-arrow fixed :border='false' @click-left="onClickLeft"/>
+    <van-nav-bar
+      :title="item.name"
+      left-arrow
+      fixed
+      :border='false'
+      @click-left="onClickLeft"/>
     <div class="warpper_top"></div>
     <van-pull-refresh v-model="isLoading" @refresh="onRefresh" loading-text="加载中...">
       <div class="limit_channel">
@@ -65,7 +70,6 @@ export default {
     }
   }
 }
-
 </script>
 <style scoped>
 .limit_channel {

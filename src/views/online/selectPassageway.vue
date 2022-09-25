@@ -1,32 +1,52 @@
 <!-- 更换通道 -->
 <template>
   <div>
-    <van-nav-bar class="channel_nav theme_bg" title="选择刷卡通道" left-arrow fixed :border='false'
-                 @click-left="onClickLeft"/>
+    <van-nav-bar
+      class="channel_nav theme_bg"
+      title="选择刷卡通道"
+      left-arrow
+      fixed
+      :border="false"
+      @click-left="onClickLeft"
+    />
     <div class="warpper"></div>
     <div class="online_channel">
       <div class="top">
         <div>信用卡刷卡</div>
-        <div class="amount">{{ Number(money) |toFixed }}元</div>
+        <div class="amount">{{ Number(money) | toFixed }}元</div>
       </div>
       <div class="channel">
         <div class="title">选择刷卡通道</div>
         <ul>
-          <li class="channel_item" v-for="(item,i) in channelList" :key="i" @click="toOnline(item)">
+          <li
+            class="channel_item"
+            v-for="(item, i) in channelList"
+            :key="i"
+            @click="toOnline(item)"
+          >
             <div class="name">
-              <img src="../../assets/online/pay_yinlian.png" alt="">
+              <img src="../../assets/online/pay_yinlian.png" alt="" />
               <span>{{ item.alias }}</span>
-              <span class="limit theme" @click="limit($event,item)">查看限额</span>
-            </div>
-            <div class="tips">
-              <div>单笔限额：{{ item.limitMin |shortMoney }}元 - {{ item.limitMax |shortMoney }}元</div>
-              <div>单日限额：{{ item.dayMax |shortMoney }}元</div>
+              <span class="limit theme" @click="limit($event, item)"
+                >查看限额</span
+              >
             </div>
             <div class="tips">
               <div>
-                交易时间：{{ item.startTime.slice(0, 5) }} - {{ item.endTime.slice(0, 5) }}
+                单笔限额：{{ item.limitMin | shortMoney }}元 -
+                {{ item.limitMax | shortMoney }}元
               </div>
-              <div>交易费率{{ (item.costRate * 100)|toFixed }}% + {{ item.costFee }}元/笔</div>
+              <div>单日限额：{{ item.dayMax | shortMoney }}元</div>
+            </div>
+            <div class="tips">
+              <div>
+                交易时间：{{ item.startTime.slice(0, 5) }} -
+                {{ item.endTime.slice(0, 5) }}
+              </div>
+              <div>
+                交易费率{{ (item.costRate * 100) | toFixed }}% +
+                {{ item.costFee }}元/笔
+              </div>
             </div>
           </li>
         </ul>
@@ -36,8 +56,8 @@
 </template>
 
 <script>
-import {NavBar, Tag} from 'vant'
-import {newFacadeTopup} from '@/api/online'
+import { NavBar, Tag } from "vant";
+import { newFacadeTopup } from "@/api/online";
 
 export default {
   data() {
@@ -46,7 +66,7 @@ export default {
       money: 0,
       card: {},
       brandId: this.global.brandId,
-      phone: '',
+      phone: "",
     };
   },
   components: {
@@ -54,32 +74,35 @@ export default {
     [Tag.name]: Tag,
   },
   created() {
-    this.phone = localStorage.getItem('phone')
-    this.card = JSON.parse(sessionStorage.getItem('card'))
-    this.money = sessionStorage.getItem('money')
-    this.channelList = JSON.parse(sessionStorage.getItem('selChannel'))
+    this.phone = localStorage.getItem("phone");
+    this.card = JSON.parse(sessionStorage.getItem("card"));
+    this.money = sessionStorage.getItem("money");
+
+    this.channelList = JSON.parse(sessionStorage.getItem("selChannel"));
   },
   methods: {
     onClickLeft() {
-      window.history.back()
-      return
-      this.$router.push({name: 'online'})
+      window.history.back();
+      return;
+      this.$router.push({ name: "online" });
     },
     toOnline(channel) {
-      sessionStorage.setItem('channel', JSON.stringify(channel))
-      this.$router.push({ name: 'confirmAtion' })
+      sessionStorage.setItem("channel", JSON.stringify(channel));
+      this.$router.push({ name: "confirmation" });
     },
     limit(event, item) {
       event.cancelBubble = true;
-      this.$router.push({name: 'limit', params: {item: JSON.stringify(item)}})
-    }
-  }
-}
-
+      this.$router.push({
+        name: "limit",
+        params: { item: JSON.stringify(item) },
+      });
+    },
+  },
+};
 </script>
 <style scoped>
 .online_channel .top {
-  background: url("../../assets/online/channel_top_bg.png") center no-repeat;
+  background: #9B3C9D;
   background-size: 100% 100%;
   width: 100%;
   height: 155px;
@@ -100,7 +123,7 @@ export default {
 }
 
 .channel_nav >>> .van-icon {
-  color: #FFFFFF !important;
+  color: #ffffff !important;
 }
 
 .channel {
@@ -139,7 +162,7 @@ export default {
   position: absolute;
   right: -15px;
   top: 0;
-  background: #FFF5E9;
+  background: #fff5e9;
   border-radius: 0px 12px 0px 12px;
   line-height: 24px;
   display: inline-block;
@@ -162,5 +185,4 @@ export default {
   text-align: left;
   line-height: 20px;
 }
-
 </style>

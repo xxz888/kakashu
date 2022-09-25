@@ -1,74 +1,91 @@
 <template>
-  <div style="background: #fff;">
-    <van-nav-bar class="agent_nav theme_bg" style="background: none;" :border='false' title="我的团队" left-arrow
-                 @click-left="onClickLeft" />
+  <div>
+    <van-nav-bar class="agent_nav theme_bg" style="background: none;" :border='false' title="顶级代理" left-arrow
+                 @click-left="onClickLeft">
+      <template #right>
+        <div class="agent_right_tip theme" @click="onClickRight()">规则说明</div>
+      </template>
+    </van-nav-bar>
     <div class="warpper_top"></div>
     <van-pull-refresh v-model="isLoading" @refresh="onRefresh" loading-text="加载中...">
       <div>
-        <div class="profit_type_top theme_bg">
-          <ul>
-            <li class="item">
-              <div class="left">
-                <div class="title">总人数</div>
-                <div class="amount">{{ totalData.all }}</div>
-              </div>
-            </li>
-          </ul>
+        <div class="agent_top_bg theme_bg">
+          <div class="left">
+            <img src="../../assets/im_top_bs_logo.png" alt="">
+          </div>
+          <div class="right">
+            <span>{{ gradeName }}</span>
+            <p><span>当月补贴：</span> {{ amount | toFixed }}元</p>
+          </div>
         </div>
-        <div class="profit_share_cont">
-          <div class="cash_box">
-            <div class="cash_title">
-              说明：：：：
-<!--              <div class="type">用户</div>-->
-            </div>
-
-            <ul class="cash_list">
-              <li class="cash_item">
-                <div style="margin-bottom: 5px;font-size:14px;font-weight: bold">我的直推</div>
-                <van-row>
-                  <van-col :span="12">总人数：0</van-col>
-                  <van-col :span="12">已实名：0</van-col>
-                </van-row>
-                <van-row>
-                  <van-col :span="12">已首还：0</van-col>
-                  <van-col :span="12">已激活：0</van-col>
-                </van-row>
+        <div class="agent_cont">
+          <div class="agent_sum">
+            <ul>
+              <li class="agent_sum_item">
+                <div>当月激活(人)：<span class="theme">{{ sonActive.activationByTime }}</span></div>
+                <div>当月达标(人)：<span class="theme">{{ sonActive.extensionByTime }}</span></div>
               </li>
-              <li class="cash_item">
-                <div style="margin-bottom: 5px;font-size:14px;font-weight: bold">我的间推</div>
-                <van-row>
-                  <van-col :span="12">总人数：0</van-col>
-                  <van-col :span="12">已实名：0</van-col>
-                </van-row>
-                <van-row>
-                  <van-col :span="12">已首还：0</van-col>
-                  <van-col :span="12">已激活：0</van-col>
-                </van-row>
+              <li class="agent_sum_item">
+                <div>总激活(人)：<span class="theme">{{ sonActive.activationAll }}</span></div>
+                <div>总达标(人)：<span class="theme">{{ sonActive.extensionAll }}</span></div>
               </li>
             </ul>
-
+          </div>
+          <van-sticky :offset-top="46">
+            <div class="agent_search">
+              <van-search v-model="text" show-action background="none" placeholder="请输入手机号或者姓名" @search="onSearch">
+                <template #action>
+                  <div class="agent_search_btn" @click="onSearch">搜索</div>
+                </template>
+              </van-search>
+            </div>
+          </van-sticky>
+          <div>
+            <van-list v-model="isupLoading" :finished="finished" finished-text="没有更多了" @load="onLoad">
+              <ul class="agent_list" v-if="sonList.length>0">
+                <li class="agent_item" v-for="(item,index) in sonList" :key="index">
+                  <div class="left">
+                    <img src="../../assets/agent/img_icon.png" alt="">
+                  </div>
+                  <div class="cont">
+                    <div class="title">{{ item.userName }}
+                      <span :class="'agent_grade_'+item.gradeName ">
+                        {{ item.gradeName }}
+                      </span>
+                    </div>
+                    <span class="tips">ID:{{ item.userId }}</span>
+                    <p>直接激活：<span class="theme">{{ item.firSize }}</span>人</p>
+                  </div>
+                  <div class="right">
+                    <div class="phone">{{ item.phone |dataHidden }}</div>
+                    <span class="tips">达标时间：{{ item.createTime }}</span>
+                    <p class="title">直接实名：<span class="theme">{{ item.realSize }}</span>人</p>
+                  </div>
+                </li>
+              </ul>
+              <van-empty class="user_empty" v-else
+                         :image="require('../../assets/user_empty.png')"/>
+            </van-list>
           </div>
         </div>
       </div>
     </van-pull-refresh>
-    <level ref="levelSelect" :diffs="diffList" />
   </div>
 </template>
+
 <script>
 import {
   NavBar,
+  Sticky,
+  Search,
   PullRefresh,
-  Icon,
   List,
   Empty,
-  DropdownMenu,
-  DropdownItem,
-  Button, Field,
-  Row,
-  Col
-} from 'vant'
-import { getBelow, belowCount, getUserLevelList, changeUserLevel } from "@/api/user";
-import level from "@/components/level/level";
+} from 'vant';
+import {newsQuery} from '@/api/showBrand'
+import {
+  agentSonQuery, agentUserQuery, agentGradeNameQuery, agentUserWagesQuery, agentSonRecordQuery
+} from "@/api/agent";
 
 export default {
   data() {
@@ -76,115 +93,171 @@ export default {
       brandId: localStorage.getItem('brandId'),
       userId: localStorage.getItem('userId'),
       phone: localStorage.getItem('phone'),
+      text: "",
       isLoading: false,
-      form: {
-        page: 0,
-        size: 20,
-        phone: ''
-      },
-      fuwuList: [],
-      queryType: 1, //1:快捷,2:余额还款,3:空卡还款,6:花呗
-      title: "刷卡",
-      totalData: {},
-      profit: [],
       isupLoading: false,
       finished: false,
-      diffList: [],
-      diffShow: false,
-      selectUserId: 0
-    }
+      sonList: [],
+      size: 20,
+      gradeName: '顶级代理',
+      amount: 0,
+      sonActive: {
+        activationAll: "0",
+        activationByTime: "0",
+        extensionAll: "0",
+        extensionByTime: "0",
+      },
+      fuwuList: []
+    };
   },
   components: {
-    level,
     [NavBar.name]: NavBar,
+    [Sticky.name]: Sticky,
+    [Search.name]: Search,
     [PullRefresh.name]: PullRefresh,
-    [Icon.name]: Icon,
-    [Field.name]: Field,
     [List.name]: List,
-    [Empty.name]: Empty,
-    [DropdownMenu.name]: DropdownMenu,
-    [DropdownItem.name]: DropdownItem,
-    [Button.name]: Button,
-    [Row.name]: Row,
-    [Col.name]: Col
+    [Empty.name]: Empty
   },
+  computed: {},
   created() {
-    this.total()
+    this._newsQuery()
+    this._agentUserQuery()
+    this._agentSonRecordQuery()
   },
   methods: {
+        onClickRight(){
+   this.$router.push({
+        name: "appLink",
+        params: {
+          url: JSON.stringify(
+            "https://dingcard.oss-cn-shanghai.aliyuncs.com/profita.png"
+          ),
+          title: JSON.stringify("咔咔鼠代理机制及优势"),
+          type: "2",
+        },
+      });
+    },
     onClickLeft() {
       this.publicJs.back();
     },
-    total(){
-      belowCount().then(res => {
+    _newsQuery() {
+      newsQuery(this.global.brandId, '功能跳转').then(res => {
         if (res.resp_code == '000000') {
-          this.totalData = res.result
+          this.fuwuList = res.result.content
         }
       })
     },
-    _profitSumQuery() {
-      getBelow(this.form).then(res => {
+    _agentUserQuery() {
+      agentUserQuery(this.userId).then(res => {
+        if (res.resp_code == "000000" && res.result) {
+          this._agentGradeNameQuery(res.result.promotionLevelId)
+          this._agentUserWagesQuery(res.result.promotionLevelId)
+        }
+      })
+    },
+    _agentGradeNameQuery(promotionLevelId) {
+      agentGradeNameQuery(promotionLevelId).then(res => {
+        if (res.resp_code == "000000") {
+          this.gradeName = res.result.gradeName
+        }
+      })
+    },
+    _agentUserWagesQuery(promotionLevelId) {
+      agentUserWagesQuery(this.userId, promotionLevelId).then(res => {
+        if (res.resp_code == "000000") {
+          this.amount = res.result
+        }
+      });
+    },
+    _agentSonRecordQuery() {
+      agentSonRecordQuery(this.userId).then(res => {
+        if (res.resp_code == "000000") {
+          this.sonActive = res.result
+        }
+      })
+    },
+    goList(item, event) {
+      event.cancelBubble = true;
+      repaymentsupportbank(item.version).then(res => {
         if (res.resp_code == '000000') {
-          this.profit.push(...res.result)
-          this.isupLoading = false
-          if (res.result.length == 0) {
-            this.finished = true;
+          this.bankList = res.result
+          this.zhiciTrueFalseBy = true
+        }
+      })
+    },
+    _agentSonQuery() {
+      this.isupLoading = true;
+      this.finished = true;
+      agentSonQuery(this.userId, this.text, '1', '99999').then(res => {
+        this.sonList = [];
+        if (res.resp_code == "000000") {
+          if (res.result && res.result.length > 0) {
+            this.sonList = res.result;
+            this.isupLoading = false;
+            this.size += 10
+            if (this.size >= this.sonList.length) {
+              this.finished = true;
+            } else {
+              this.finished = true;
+            }
+          } else {
+            this.sonList = [];
+            this.finished = true
+            this.isupLoading = false;
           }
+        } else {
+          this.sonList = [];
+        }
+      });
+    },
+
+    link(item) {
+      let num = 0
+      this.fuwuList.map((key) => {
+        if (key.title == item) {
+          var url = key.content
+          this.$router.push({
+            name: 'appLink',
+            params: {
+              url: JSON.stringify(url),
+              title: JSON.stringify(key.title),
+              type: "2"
+            }
+          });
+          return
+        } else {
+          num++
         }
       })
-    },
-    handleName(name){
-      if(name){
-        return name
+      if (num == this.fuwuList.length) {
+        this.$toast({
+          message: '敬请期待',
+          position: 'bottom'
+        })
       }
-      return '未实名'
-    },
-    search(){
-      this.form.page = 1;
-      this.profit = []
-      this._profitSumQuery();
-    },
-    levelList(user){
-      this.selectUserId = user.id
-      getUserLevelList({ userId: user.id }).then(res => {
-        if(res.resp_code == '000000'){
-          if(res.result.length > 0){
-            this.diffList = res.result
-            this.$refs.levelSelect.open()
-          }else{
-            this.$toast( { message: '您的vip等级不够', position: 'bottom' } )
-          }
-        }
-      })
-    },
-    changeLevel(level){
-      changeUserLevel({ userId: this.selectUserId, level }).then(res => {
-        this.$toast({ message: res.resp_message, position: 'bottom' })
-      })
-    },
-    onLoad() {  //上啦加载
-      setTimeout(() => {
-        this.form.page += 1
-        this._profitSumQuery()
-      }, 500);
     },
     // 下拉刷新
     onRefresh() {
       setTimeout(() => {
         this.$toast('刷新成功');
+        this._agentUserQuery()
+        this._agentSonRecordQuery()
         this.isLoading = false;
       }, 1000);
+    },
+    onLoad() {  //上啦加载
+      setTimeout(() => {
+        this._agentSonQuery()
+      }, 500);
+    },
+    onSearch() {
+      this.size = 20
+      this._agentSonQuery()
     }
   }
 }
 </script>
 <style scoped>
->>> .van-popup {
-  width: 94.7%;
-  left: 10px;
-  border-radius: 0px 0px 5px 5px;
-}
-
 .agent_nav >>> .van-nav-bar__title.van-ellipsis {
   color: #fff;
 }
@@ -193,137 +266,146 @@ export default {
   color: #FFFFFF !important;
 }
 
-.profit_type_top_bg {
-  background: #fff;
-  padding: 3px;
-  border-radius: 10px;
-  box-shadow: 0px 1px 10px 0px rgba(0, 0, 0, 0.09);
-}
-
-.profit_type_top_bg >>> .van-dropdown-menu__bar {
-  box-shadow: none;
-}
-
-.profit_type_top {
-  width: 100%;
-  padding: 10px 0 25px 0;
-  font-size: 15px;
-  color: #fff;
-  border-radius: 0 0 20px 20px;
-}
-
-.profit_type_top .item {
-  display: flex;
-  padding-bottom: 20px;
-}
-
-.profit_type_top .item > div {
-  flex: 1;
-  text-align: center;
-}
-
-.profit_type_top .item .title {
+.agent_right_tip {
   font-size: 13px;
-  line-height: 30px;
-  font-weight: 300;
-
+  background: #FFFFFF;
+  border-radius: 10px 0px 0px 10px;
+  padding: 2px 2px 2px 8px;
+  margin-right: -16px;
 }
 
-.profit_type_top .item .amount {
-  font-size: 32px;
+.agent_top_bg {
+  height: 140px;
+  border-radius: 0 0 25px 25px;
+  width: 100%;
+  font-size: 17px;
+  display: flex;
+  color: #fff;
+  padding: 27px 30px;
 }
 
-.profit_type_top .item .profit_amount {
-  font-size: 20px;
+.agent_top_bg .left {
+  width: 65px;
 }
 
-.profit_type_top .item .right {
-  position: relative;
+.agent_top_bg .left > img {
+  height: 55px;
+  width: 55px;
 }
 
-.profit_share_cont {
+.agent_top_bg .right {
+  flex: 1;
+  padding-top: 5px;
+}
+
+.agent_top_bg .right p > span {
+  font-size: 14px;
+}
+
+.agent_cont {
   padding: 0 10px;
   margin-top: -30px;
 }
 
-.profit_type_date {
-  font-size: 14px;
-  color: #333;
-}
-
-.profit_type_date .item {
-  display: flex;
-  line-height: 44px;
-  text-align: center;
-}
-
-.profit_type_date .item .right {
-  width: 40px;
-  color: #666;
-  font-size: 15px;
-  line-height: 44px;
-}
-
-.profit_type_date .item div {
-  flex: 1;
-}
-
-.active {
-  color: #F63802;
-}
-
-.profit_type_date .type {
-  font-size: 12px;
-  color: #666;
-}
-
-.cash_box {
-  margin-top: -20px;
-  padding: 0 10px;
-}
-
-
-.cash_title {
+.agent_sum {
   width: 100%;
-  height: 50px;
+  padding: 10px 15px;
   background: #FFFFFF;
-  box-shadow: 0px 1px 10px 0px rgba(0, 0, 0, 0.09);
   border-radius: 10px;
-  display: flex;
-  text-align: center;
-  line-height: 50px;
+}
+
+.agent_sum_item {
   font-size: 13px;
+  display: flex;
+}
+
+.agent_sum_item div {
+  flex: 1;
+  line-height: 24px;
+}
+
+.agent_item {
+  padding: 10px 15px;
+  background: #fff;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  font-size: 13px;
+  display: flex;
+  /* justify-content: space-between; */
+}
+
+.agent_item .cont {
+  flex: 1;
+}
+
+.agent_item .right {
+  flex: 1;
+}
+
+.agent_item .left {
+  width: 50px;
+}
+
+.agent_item .left > img {
+  height: 40px;
+  width: 40px;
+}
+
+.agent_item .right {
+  text-align: right;
+}
+
+.agent_item .tips {
+  color: #999;
+  font-size: 12px;
+  line-height: 30px;
+}
+
+.agent_item .phone {
   color: #666;
 }
 
-.cash_title .type {
-  width: 100px;
-}
-
-.cash_title .amount {
-  flex: 1;
-}
-
-.cash_list {
-  margin-top: 20px;
-  height: 300px;
-}
-
-.cash_item {
-  height: 74px;
-  padding-top: 6px;
-  font-size: 12px;
+.agent_search {
   background: #fff;
-  color: #333;
-  border-bottom: 1px solid #ddd;
+  margin: 10px 0;
+  border-radius: 10px;
 }
 
-.cash_item .type {
-  width: 100px;
+.agent_search >>> .van-search {
+  padding: 0;
 }
 
-.cash_item .amount {
-  line-height: 54px;
-  flex: 1;
+.agent_search >>> .van-search__content {
+  background: #fff;
+  border-radius: 10px;
 }
+
+.agent_search_btn {
+  color: #2574EA;
+}
+
+.agent_grade_达标代理 {
+  display: inline-block;
+  background: #9B3C9D;
+  border-radius: 9px;
+  padding: 0 8px;
+  font-size: 11px;
+  color: #fff;
+  margin-left: 5px;
+}
+
+.agent_grade_普通代理 {
+  display: inline-block;
+  background: #0d18b3;
+  border-radius: 9px;
+  padding: 0 8px;
+  font-size: 11px;
+  color: #fff;
+  margin-left: 5px;
+}
+
+.user_empty >>> .van-empty__image img {
+  height: auto;
+}
+
 </style>

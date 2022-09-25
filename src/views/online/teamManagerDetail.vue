@@ -158,7 +158,7 @@ export default {
       getTeamExtension(userId).then((res) => {
           this.$dialog.alert({
               theme: 'round-button',
-          confirmButtonColor:'#4cc566',
+          confirmButtonColor:'#9B3C9D',
           title: '',
           message: `今天新增注册:${res.result.todayTotal}人\n今天新增实名:${res.result.todayRealname}人\n\n当月新增注册:${res.result.curMonthTotal}人\n当月新增实名:${res.result.curMonthRealname}人\n\n昨天新增注册:${res.result.yesterdayTotal}人\n昨天新增实名:${res.result.yesterdayRealname}人\n\n上月新增注册:${res.result.preMonthTotal}人\n上月新增实名:${res.result.preMonthRealname}人\n`,
         }).then(() => {
@@ -317,7 +317,7 @@ export default {
   height: 20px;
 }
 .userTitle {
-  color: #4cc566;
+  color: #9B3C9D;
 }
 .themeTitle {
   padding: 5px;
@@ -366,7 +366,7 @@ export default {
 .detailClass{
     width: 70px;
     height: 24px;
-    background: #4cc566;
+    background: #9B3C9D;
     border-radius: 12px;
     color: #fff;
     text-align: center;

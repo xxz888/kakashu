@@ -7,7 +7,7 @@
       <div class="bill_tab_box">
         <div class="bill_tab">
           <ul class="bill_tab_type van-hairline--bottom">
-            <li class="item" v-if="!this.form.empowerToken" :class="type==1?'typeActive':''" @click="typeChange(1)">
+            <li v-if="!this.form.empowerToken" class="item" :class="type==1?'typeActive':''" @click="typeChange(1)">
               <img v-if="type==1"
                    src="../../assets/bill/quick_icon_on.png" alt="">
               <img v-else src="../../assets/bill/quick_icon_off.png"
@@ -23,8 +23,15 @@
                    alt="">
               <div>还款记录</div>
             </li>
+            <li class="item" :class="type==3?'typeActive':''" @click="typeChange(3)">
+              <img v-if="type==3"
+                   src="../../assets/bill/zero_icon_on.png" alt="">
+              <img v-else src="../../assets/bill/zero_icon_off.png"
+                   alt="">
+              <div>空卡记录</div>
+            </li>
           </ul>
-          <van-dropdown-menu active-color="#4cc566" class="menu">
+          <van-dropdown-menu active-color="#9B3C9D" class="menu">
             <van-dropdown-item v-model="yaer" :options="yearList" @change="dateChange"/>
             <van-dropdown-item v-model="month" :options="monthList" @change="dateChange"/>
           </van-dropdown-menu>
@@ -32,7 +39,11 @@
       </div>
       <div class="bill_cont">
         <van-pull-refresh v-model="isLoading" @refresh="onRefresh">
-          <van-list v-model="isupLoading" :finished="finished" finished-text="" @load="onLoad">
+          <van-list
+            v-model="isupLoading"
+            :finished="finished"
+            finished-text="没有更多了"
+            @load="onLoad">
             <ul class="pay_list" v-if="type==1 && quickList.length>0 ">
               <li class="pay_item" v-for="item in quickList" @click='detail(item,"quickDetail")' :key="item.key">
                 <div class="pay_item_top van-hairline--bottom">
@@ -45,6 +56,7 @@
                     </div>
                     <div class="pay_card_amount"> 费率 <span>{{ Number(item.rate * 100) |toFixed }}%</span></div>
                   </div>
+                  <!-- | 总额 {{item.amount |toFixed }}元 -->
                   <div class="quick_status">
                     <div>{{ item.amount |toFixed }}元</div>
                     <div :class="'brushStatus'+item.orderStatus">{{ item.orderStatus |status }}</div>
@@ -54,7 +66,8 @@
             </ul>
             <ul class="pay_list" v-else-if="type==2&& payList.length>0 ">
               <li class="pay_item" v-for="item in payList" :key="item.key">
-                <div>
+                <!-- 为了兼容planType2是老计划 -->
+                <div v-if="item.planType==2">
                   <div class="pay_item_top van-hairline--bottom">
                     <div class="left">
                       <img
@@ -62,8 +75,32 @@
                     </div>
                     <div class="right">
                       <div class="pay_card_name">{{ item.bankName }}
-                        <span>（{{item.creditCardNumber|cardNoEnd }}）</span>
+                        <span>（{{ item.creditCardNumber |cardNoEnd }}）</span></div>
+                      <div class="pay_card_amount"> 已还 <span>{{ item.repaymentedAmount | toFixed }}元</span> | 总额
+                        {{ item.taskAmount |toFixed }}元
                       </div>
+                    </div>
+                    <span class="pay_status"
+                          :class="'taskStatus'+item.taskStatus">{{ item.taskStatus |plantaskstatus }}</span>
+                  </div>
+                  <div class="pay_item_detail" @click='detail(item,type,item.planType)'>
+                    <div>{{ item.createTime }}</div>
+                    <div class="right">
+                      <span>查看详情</span>
+                      <img src="../../assets/right_icon.png" alt="">
+                    </div>
+                  </div>
+                </div>
+                <div v-else>
+                  <div class="pay_item_top van-hairline--bottom">
+                    <div class="left">
+                      <img
+                        :src="require('../../assets/bankIcon/BANK_'+item.logimg+'.png')"/>
+                    </div>
+                    <div class="right">
+                      <div class="pay_card_name">{{ item.bankName }} <span>（{{
+                          item.creditCardNumber|cardNoEnd
+                        }}）</span></div>
                       <div class="pay_card_amount"> 已还 <span>{{ item.repaymentedAmount | toFixed }}元</span> | 总额
                         {{ item.taskAmount |toFixed }}元
                       </div>
@@ -116,7 +153,7 @@
 </template>
 <script>
 import {NavBar, DropdownMenu, DropdownItem, PullRefresh, List, Empty} from 'vant'
-import {repaymentOrderQuery, bankIconQuery, quickOrderQuery, cardRecords, cardRecordsNew, getPlanNew} from "@/api/bill"
+import {repaymentOrderQuery, bankIconQuery, quickOrderQuery, cardRecords, cardRecordsNew, getPlanNew,} from "@/api/bill"
 import {checkOrder} from "@/api/zero";
 
 export default {
@@ -167,19 +204,42 @@ export default {
         maxDateTime: null,
         userId: localStorage.getItem('userId'),
         page: 0,
-        size: 20,
-        empowerToken: null
+        size: 100,
+                empowerToken: null
+
       },
       zeroPayList: []
-    }
+    };
   },
+  computed: {},
   created() {
     if(this.$route.query.empowerToken){
       this.form.empowerToken = this.$route.query.empowerToken
     }else{
       this.form.empowerToken = null
     }
-    this.getcard()
+    this.ltype = this.getUrlParam("type")
+    if (this.ltype != 'h5') {
+      window.getcard = this.getcard
+    }
+    this.getbankIcon()
+    this.getData()
+  },
+  // beforeRouteEnter(to, from, next) {
+  //   // 设置下一个路由的 meta
+  //   if (from.name == 'quickDetail' || from.name == 'executeTask' || from.name == 'previewPlan' || from.name == 'executeTaskNew') {
+  //     to.meta.isBack = true;
+  //     to.meta.keepAlive = true;
+  //   } // 让 A 缓存，即不刷新
+  //   next();
+  // },
+  activated() {
+    if (!this.$route.meta.isBack) {
+      this.getcard()
+      // 如果isBack是false，表明需要获取新数据，否则就不再请求，直接使用缓存的数据
+    }
+    // 恢复成默认的false，避免isBack一直是true，导致下次无法获取数据
+    this.$route.meta.isBack = false
   },
   mounted() {
     window.addEventListener("scroll", this.handleScroll);
@@ -208,7 +268,17 @@ export default {
         document.body.scrollTop;
     },
     onClickLeft() {
-      this.publicJs.back();
+            this.publicJs.back();
+
+      // if (this.ltype == 'h5') {
+      //   this.publicJs.back();
+      // } else {
+      //   try {
+      //     window.android.invokeMethod(7, ["true"]);
+      //   } catch (e) {
+      //     window.webkit.messageHandlers.iosWebKit.postMessage('goroothome');
+      //   }
+      // }
     },
     formatDateTime(value) {
       let date = new Date(value);
@@ -268,18 +338,44 @@ export default {
       });
     },
     _cardRecords() {
-    },
-    _cardRecordsNew() {
       this.form.userId = localStorage.getItem('userId')
       let yearLet = this.yaer
       let monthLet = Number(this.month)
-      this.form.minDateTime = yearLet + '-' + '0' + monthLet + '-01 00:00:00'
+      this.form.minDateTime = yearLet + '-'  + (monthLet < 10 ? '0' : '') + monthLet + '-01 00:00:00'
       monthLet += 1
       if (monthLet == 13) {
         monthLet = '1'
         yearLet += 1
       }
-      this.form.maxDateTime = yearLet + '-' + '0' + monthLet + '-01 00:00:00'
+      this.form.maxDateTime = yearLet + '-'  + (monthLet < 10 ? '0' : '') + monthLet + '-01 00:00:00'
+      cardRecords(this.form).then(res => {
+        if(!res.result) return
+        res.result.content.forEach(item => {
+          for (var j = 0; j < this.bankIconList.length; j++) {
+            if (item.bankName == this.bankIconList[j].bank_name) {
+              item.logimg = this.bankIconList[j].bank_acronym;
+              item.background = this.bankIconList[j].background;
+              break;
+            } else {
+              item.background = "#232528";
+              item.logimg = "default";
+            }
+          }
+        })
+        this.zeroPayList = res.result.content
+      })
+    },
+    _cardRecordsNew() {
+      this.form.userId = localStorage.getItem('userId')
+      let yearLet = this.yaer
+      let monthLet = Number(this.month)
+      this.form.minDateTime = yearLet + '-'  + (monthLet < 10 ? '0' : '') + monthLet + '-01 00:00:00'
+      monthLet += 1
+      if (monthLet == 13) {
+        monthLet = '1'
+        yearLet += 1
+      }
+      this.form.maxDateTime = yearLet + '-'  + (monthLet < 10 ? '0' : '') + monthLet + '-01 00:00:00'
       this.payList = []
       cardRecordsNew(this.form).then(res => {
         res.result.content.forEach(item => {
@@ -298,22 +394,47 @@ export default {
           item['planType'] = 1
           this.payList.push(item)
         })
-        this.isupLoading = false
-        if(res.result.content.length < this.form.size){
-          this.finished = true
+        this._repaymentOrderQuery()
+      })
+    },
+    _repaymentOrderQuery() {
+      repaymentOrderQuery(this.brandId, this.userId, this.yaer, this.month, this.type, this.size).then(res => {
+        if (res.resp_code == "000000") {
+          res.result.content.forEach(item => {
+            for (var j = 0; j < this.bankIconList.length; j++) {
+              if (item.bankName == this.bankIconList[j].bank_name) {
+                item.logimg = this.bankIconList[j].bank_acronym;
+                item.background = this.bankIconList[j].background;
+                break;
+              } else {
+                item.background = "#232528";
+                item.logimg = "default";
+              }
+            }
+          })
+          res.result.content.forEach(item => {
+            item['planType'] = 2
+            this.payList.push(item)
+          })
+          if (this.payList.length > 0) {
+            this.isupLoading = false;
+            this.size += 10
+            this.totalElements = res.result.totalElements
+            if (this.payList.length >= res.result.totalElements) {
+              this.finished = true;
+            } else {
+              this.finished = false;
+            }
+          } else {
+            this.payList = [];
+            this.finished = true
+            this.isupLoading = true;
+          }
         }
       })
     },
     _quickOrderQuery() {
-      let startTime = this.yaer + '-' + this.month.toString().padStart(2, '0') + '-01 00:00:00';
-      let nextMonth = parseInt(this.month) + 1
-      let endTime;
-      if(nextMonth > 12){
-        endTime = (this.yaer+1) + '-01-01 00:00:00'
-      }else{
-        endTime = this.yaer + '-' + nextMonth.toString().padStart(2, '0') + '-01 00:00:00'
-      }
-      quickOrderQuery({startTime: startTime, endTime: endTime }).then(res => {
+      quickOrderQuery(this.brandId, this.userId, this.yaer, this.month, this.size).then(res => {
         if (res.resp_code == "000000") {
           res.result.content.forEach(item => {
             for (var j = 0; j < this.bankIconList.length; j++) {
@@ -343,24 +464,35 @@ export default {
             this.isupLoading = true;
           }
         }
-      });
+      })
     },
     detail(item, name, planType) {
       if (name == 2) {
-        this.$store.commit('Loading')
-        getPlanNew({ planId: item.id, empowerToken: this.form.empowerToken }).then(res => {
-          this.$store.commit('closeLoading')
-          if (res.resp_code == '000000') {
-            this.$router.push({
-              name: 'executeTaskNew',
-              query: {empowerToken: this.form.empowerToken},
-              params: {item: JSON.stringify(item), task: JSON.stringify(res.result)}
-            });
-          }
-        })
+        if (planType == 2) {
+          this.$router.push({
+            name: 'executeTask',
+            params: {
+              item: JSON.stringify(item),
+              type: JSON.stringify(this.type)
+            }
+          })
+        } else {
+          this.$store.commit('Loading')
+          getPlanNew(item.id,this.form.empowerToken).then(res => {
+            this.$store.commit('closeLoading')
+            if (res.resp_code == '000000') {
+              this.$router.push({
+                name: 'executeTaskNew',
+                query: {empowerToken: this.form.empowerToken},
+                params: {item: JSON.stringify(item), task: JSON.stringify(res.result)}
+              });
+            }
+          })
+        }
       } else if (name == 3) {
         this.$store.commit('Loading')
         checkOrder(item.id).then(res => {
+          this.publicJs.output(res, "接口");
           this.$store.commit('closeLoading')
           if (res.resp_code == '000000') {
             this.$router.push({
@@ -393,9 +525,7 @@ export default {
       }, 500);
     },
     onLoad() {
-      let time = setTimeout(() => {
-        this.form.page++
-        this.isupLoading = true
+      setTimeout(() => {
         if (this.type == 2) {
           this._cardRecordsNew()
         } else if (this.type == 3) {
@@ -403,9 +533,8 @@ export default {
         } else {
           this._quickOrderQuery()
         }
-        clearTimeout(time)
       }, 500);
-    }
+    },
   }
 }
 /*  */
@@ -421,8 +550,7 @@ export default {
 }
 
 .bill_top_bg {
-  width: 100%;
-  background: #4cc566;
+background: #9B3C9D;
   background-size: 100% 100%;
   height: 120px;
   color: #fff;
@@ -458,7 +586,7 @@ export default {
 }
 
 .typeActive {
-  color: #4cc566 !important;
+  color: #9B3C9D !important;
 }
 
 .bill_cont {
@@ -516,7 +644,7 @@ export default {
 }
 
 .pay_item_top .right .pay_card_amount > span {
-  color: #F63802;
+  color: #9B3C9D;
 }
 
 .pay_item_detail {

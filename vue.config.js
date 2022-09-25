@@ -22,9 +22,9 @@ module.exports = {
     loaderOptions: {
       less: {
         modifyVars: {
-            red: '#FE6C3E',
+            red: '#9B3C9D',
             blue: '#666',
-            green:'4cc566',
+            green:'#9B3C9D',
           // orange: '#f08d49',
           // 'text-color': '#111',
           // 'tabbar-item-active-color':'#E3B66F',

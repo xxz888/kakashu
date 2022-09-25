@@ -3,7 +3,7 @@
       <van-nav-bar class="agent_nav theme_bg" style="background: none;" :border='false' title="增加用户" left-arrow @click-left="onClickLeft"> </van-nav-bar>
      <div class="warpper_top"></div>
     <div class="top">
-      <img class="login_logo" src="@/assets/logo.png" alt="">
+      <img class="login_logo" src="@/assets/logo3.png" alt="">
       <p>心有多大 舞台就有多大</p>
     </div>
     <div class="cont">
@@ -179,7 +179,7 @@ export default {
 
 .forget {
   margin-top: 12px;
-  color: #4cc566;
+  color: #9B3C9D;
   font-size: 12px;
   text-align: right;
 }
@@ -210,7 +210,7 @@ export default {
 }
 
 .top {
-  background:#4cc566;
+  background:url(../../assets/Rectangle@2x.png) no-repeat center 0px;
   color: #fff;
   font-size: 15px;
   background-size: 100% 100%;
@@ -242,7 +242,7 @@ export default {
 }
 
 .sms {
-  color: #f63802;
+  color: #9B3C9D;
 }
 
 .btn {
@@ -253,7 +253,7 @@ export default {
   font-weight: 400;
   color: #ffffff;
   text-align: center;
-  background: #4cc566;
+  background: #9B3C9D;
   box-shadow: 0 0 16px 2px rgba(0, 0, 0, 0.1);
 
 

@@ -22,8 +22,8 @@
                   账单日 每月{{ item.billDay }}日｜还款日 每月{{ item.repaymentDay }}日
                 </div>
               </van-col>
-
-              <van-col @click="isuserable(item,'updateCard',$event)" span="4" class="card_right">
+              <van-col @click="isuserable(item,'updateCard',$event)"
+                       span="4" class="card_right">
                 <div class=" card_bank_name">
                   <span class="card_arrow_text">编辑</span>
                 </div>
@@ -38,9 +38,18 @@
                 <div class="make_plan_dec">还款总金额(元):</div>
               </van-col>
               <van-col span="12" class="">
-                <van-field @change="selChannel()" class="make_plan_input" v-model="money" placeholder="还款总金额" clearable
-                           maxlength="9" minlength="0" type="number" right-icon="edit" input-align="right"
-                           @input="moneyInput"/>
+                <van-field
+                  @change="selChannel()"
+                  class="make_plan_input"
+                  v-model="money"
+                  placeholder="还款总金额"
+                  clearable
+                  maxlength="9"
+                  minlength="0"
+                  type="number"
+                  right-icon="edit"
+                  input-align="right"
+                  @input="moneyInput"/>
               </van-col>
             </van-row>
           </div>
@@ -50,8 +59,15 @@
                 <div class="make_plan_dec">卡余额(元):</div>
               </van-col>
               <van-col span="12" class="">
-                <van-field @change="selChannel()" class="make_plan_input" v-model="autoreservedAmount"
-                           placeholder="信用卡可用余额" clearable type="number" right-icon="edit" input-align="right"/>
+                <van-field
+                  @change="selChannel()"
+                  class="make_plan_input"
+                  v-model="autoreservedAmount"
+                  placeholder="信用卡可用余额"
+                  clearable
+                  type="number"
+                  right-icon="edit"
+                  input-align="right"/>
               </van-col>
             </van-row>
             <div class="color_999 reserved_amount_tips">
@@ -79,7 +95,6 @@
                   {{ activeAutoDate }}
                 </van-col>
               </van-row>
-
             </div>
             <div class="make_plan_item " v-if="active==2">
               <div class="date_box" v-if="arr.length">
@@ -94,7 +109,6 @@
                 <img src="../../assets/two_top.png" alt="">
               </div>
             </div>
-
           </div>
           <van-row type="flex" justify="space-between" class="make_isNotPoint">
             <van-col span="10">是否去除小数点</van-col>
@@ -107,6 +121,7 @@
           </van-row>
           <div class="make_isNotPoint_tips  color_999">注：去除小数点后，实际还款金额将略大于账单金额</div>
           <van-cell :value="valExtra" is-link @click="diycity()">
+            <!-- 使用 title 插槽来自定义标题 -->
             <template #title>
               <span class="custom-title">消费地区</span>
             </template>
@@ -119,13 +134,19 @@
         </div>
       </div>
     </div>
-    <van-popup v-model="planDateTrueFalseBy" round position="bottom" :style="{ height: '63%' }">
+    <van-popup
+      v-model="planDateTrueFalseBy"
+      round
+      position="bottom"
+      :style="{ height: '63%' }">
       <div class="plan_date_title">
         <div class="left" @click="planDateTrueFalseBy=false">取消</div>
         <div class="cont">
           <div>制定还款日期</div>
         </div>
-        <div class="right" @click="dateConfirm()">确定</div>
+        <div class="right" @click="dateConfirm()">
+          确定
+        </div>
       </div>
       <div class="calendar">
         <div class='tit'>
@@ -141,8 +162,11 @@
           <div>四</div>
           <div>五</div>
           <div>六</div>
-          <div v-for="(item,index) in allArr" :key="index" :class="String(dataArr).indexOf(item.day) >-1 ? '' : 'gray'"
-               @click=" String(dataArr).indexOf(item.day) >-1 ? intervalDateSel(item.day,$event):aaa()">
+          <div
+            v-for="(item,index) in allArr"
+            :key="index"
+            :class="String(dataArr).indexOf(item.day) >-1 ? '' : 'gray'"
+            @click=" String(dataArr).indexOf(item.day) >-1 ? intervalDateSel(item.day,$event):aaa()">
             <span v-if="startDay==item.day" class="bill color_fff"
                   :class="arr.indexOf(item.day) > -1 ? 'activeDay color_fff' : ''">账单日</span>
             <span v-else-if="endDay==item.day" class="repment color_fff"
@@ -200,6 +224,7 @@ import {
 import {creditcardChannel, creditcardTask} from "@/api/plan/plan";
 import verification from "@/components/verification/verification"
 
+
 export default {
   data() {
     return {
@@ -229,12 +254,10 @@ export default {
         {id: 3, title: "次/日"},
         {id: 4, title: "次/日"}
       ],
-
       isNotPointCheck: '1', //是否还款消费去小数点
       activeIcon: require('@/assets/activeIcon.png'),
       inactiveIcon: require('@/assets/inactiveIcon.png'),
       valExtra: '请选择消费地区',
-
       dataArr: [],  //还款日期区间
       weekDay: ["日", "一", "二", "三", "四", "五", "六"],
       dataArrOne: "",
@@ -275,7 +298,6 @@ export default {
           securityCode: "",
           userName: ""
         }
-
       },
       orderCode: "",//验证码获取之后返回
       type: "",
@@ -288,7 +310,6 @@ export default {
       adcode: "",
       dayPayCountTrueFalseBy: false,
       // 日期
-
       currentMonthDateLen: 0, // 当月天数
       preMonthDateLen: 0, // 当月中，上月多余天数
       allArr: [], // 当月所有数据
@@ -312,7 +333,6 @@ export default {
     [Switch.name]: Switch,
     [Popup.name]: Popup,
     verification,
-    // channelAuth,
     [Cell.name]: Cell,
     [Area.name]: Area,
     [RadioGroup.name]: RadioGroup,
@@ -320,7 +340,6 @@ export default {
     [ActionSheet.name]: ActionSheet,
     city
   },
-  // computed: {},
   mounted() {
     this.authOnShow()
   },
@@ -330,6 +349,7 @@ export default {
     this.getDayDate()
     this.getNowFormatDate();
     this.mGetDate(this.year, this.month);
+    this.publicJs.output(this.timeDay, "当月天数");
     this.getPlanDate(2)
     this.getAllArr()
     localStorage.removeItem('isNotPoint')
@@ -337,45 +357,33 @@ export default {
   activated() {
     this.channelTrueFalseBy = false
     if (!this.$route.meta.isBack) {
-      // 如果isBack是false，表明需要获取新数据，否则就不再请求，直接使用缓存的数据
-      // 如果isFirstEnter是true，表明是第一次进入此页面或用户刷新了页面，需获取新数据
-      // this.str=''// 把数据清空，可以稍微避免让用户看到之前缓存的数据
-      //  this.gettaskbill()
       this.item = JSON.parse(this.$route.params.item);
       this.getNowFormatDate();
       this.mGetDate(this.year, this.month);
+      this.publicJs.output(this.timeDay, "当月天数");
       this.getPlanDate(2)
       this.money = ""
-      this.autoreservedAmount = "",
-        //  this.freereservedAmount="",
-        //  this.arr=[],
-        this.active = '1'
+      this.autoreservedAmount = ""
+      this.active = '1'
       this.getAllArr()
-
     }
     // 恢复成默认的false，避免isBack一直是true，导致下次无法获取数据
     this.$route.meta.isBack = true
     // 恢复成默认的false，避免isBack一直是true，导致每次都获取新数据
     this.isFirstEnter = false;
-
   },
-
   beforeRouteEnter: (to, from, next) => {
     to.meta.isBack = false
     if (from.name == 'submitPlan' || from.name == 'confirmPlan') {
       to.meta.isBack = true
-      //判断是从哪个路由过来的，如果是page2过来的，表明当前页面不需要刷新获取新数据，直接用之前缓存的数据即可
     }
     next();
   },
-
   watch: {
-
     planDateTrueFalseBy(value) {
       if (this.value == false && (this.arr.length == 0 || this.arr == '')) {
         this.active = '1'
       }
-
     },
     money(old, value) { //计算预留金额
       if (this.money >= 40 && this.arr.length != 0) {
@@ -411,7 +419,6 @@ export default {
           this.calculationReservedAmount()
         }
       }
-
     },
     onClickLeft() {
       this.publicJs.back();
@@ -444,7 +451,7 @@ export default {
           } else {
             this.addresstitle = '获取地理位置失败（点击再次获取）'
           }
-        });
+        })
       })
     },
     mGetDate(year, month) {
@@ -459,7 +466,6 @@ export default {
       var seperator2 = ":";
       var hour = date.getHours()
       var time = date.getTime()
-
       if (hour >= 18) {
         date = new Date(time + 24 * 60 * 60 * 1000)
       }
@@ -467,12 +473,10 @@ export default {
       if (month >= 1 && month <= 9) {
         month = "0" + month;
       }
-
       var strDate = date.getDate();
       if (strDate >= 0 && strDate <= 9) {
         strDate = "0" + strDate;
       }
-
       this.currentdate = strDate;
       this.year = date.getFullYear();
       this.month = month;
@@ -508,11 +512,6 @@ export default {
       }
     },
     calculationReservedAmount() {
-      //选择日期包含今天 && 制定任务时间>1点 ==0
-      // 笔数  ((天数-1)*单日还款笔数)+0
-      //选择日期不包含当天
-      //笔数  还款天数*单日还款笔数
-      // 预留金额  (还款金额/笔数*1+0.05~0.15)
       var bishu = 0
       if (this.arr.indexOf(this.dayDate) <= -1) {
         bishu = (this.arr.length * this.dayRepaymentCount)
@@ -521,8 +520,6 @@ export default {
       } else {
         bishu = ((this.arr.length - 1) * this.dayRepaymentCount) + 1
       }
-      // 预留金额计算 1+0.05~0.15
-      var jisuan = Number((Math.random() * (20 - 8) + 8 + 100) / 100).toFixed(2)
     },
     getAll(stime, etime) { //获取两日期之间日期列表函数
       //初始化日期列表，数组
@@ -545,7 +542,8 @@ export default {
       }
       this.dataArr = diffdate;
       if (this.dataArr.length > 0) {
-        this.activeAutoDate = this.dataArr[0].split("-")[1] + '-' + this.dataArr[0].split("-")[2] + '~' + this.dataArr[this.dataArr.length - 1].split("-")[1] + '-' + this.dataArr[this.dataArr.length - 1].split("-")[2]
+        this.activeAutoDate = this.dataArr[0].split("-")[1] + '-' + this.dataArr[0].split("-")[2] + '~' + this.dataArr[this.dataArr.length - 1].split("-")[1]
+          + '-' + this.dataArr[this.dataArr.length - 1].split("-")[2]
         var myDate;
         if (this.hour >= 18 ? this.dataArr[0] != this.dayDate : this.dataArr[0]) {
           myDate = new Date(Date.parse(this.dataArr[0]));
@@ -557,11 +555,16 @@ export default {
       }
       this.arr = JSON.parse(JSON.stringify(diffdate))
       this.dateList = this.arr.join(',')
+      this.publicJs.output(this.dataArr, "日期区间")
     },
     getPlanDate(item) {
       //获取日期
+      this.publicJs.output(item);
       this.dateshow = item;
       this.dataArr = [];
+      this.publicJs.output(this.item.repaymentDaymonth, "this.item.repaymentDaymonth");
+      this.publicJs.output(this.item.billDaymonth, "this.item.billDaymonth");
+      this.publicJs.output(this.year, "this.year");
       var billDay = this.item.billDay;
       var repaymentDay = this.item.repaymentDay;
       if (this.item.billDay <= 9) {
@@ -582,8 +585,11 @@ export default {
       var oDate1 = new Date(startDay.replace(/-/g, "/"));
       var oDate2 = new Date(day.replace(/-/g, "/"));
       if (oDate1.getTime() > oDate2.getTime()) {
+        this.publicJs.output("账单日比较大");
         this.getAll(startDay, endDay);
       } else {
+        this.publicJs.output("今天比较大");
+        this.publicJs.output(day);
         this.getAll(day, endDay);
       }
 
@@ -599,7 +605,6 @@ export default {
     showDate(type) {
       this.dataActive = type
       this.dateWeekList = []
-
       this.dataArr.forEach(item => {
         this.dateWeekList.push(
           {
@@ -618,7 +623,6 @@ export default {
             week: ai.week,
           });
           map[ai.week] = ai;
-
         } else {
           for (var j = 0; j < billList.length; j++) {
             var dj = billList[j];
@@ -647,7 +651,6 @@ export default {
       this.valExtra = JSON.parse(extra).merprovince + '/' + JSON.parse(extra).mercity
     },
     intervalDateSel(e, event) { //间隔选择日期
-      //alert("间隔")
       let i = this.arr.indexOf(e) // 用于判断是否选中
       if (i == -1) { // 没选中时，把id放入arr
         this.arr.push(e)
@@ -657,7 +660,6 @@ export default {
       this.dateList = this.arr.join(',')
     },
     dateConfirm() { //日期选择
-      //  this.calculationReservedAmount()
       if (this.arr.length == 0 || this.arr == '') {
         this.$toast({message: "请先选择日期", position: 'bottom'});
         return
@@ -705,7 +707,6 @@ export default {
         isPoint = 0;
         localStorage.setItem('isNotPoint', isPoint)
       }
-      //   this.$store.commit('Loading')
       creditcardChannel(
         this.item.userId,
         this.brandId,
@@ -715,10 +716,9 @@ export default {
         String(dateList),
         this.dayRepaymentCount,
       ).then(res => {
+        this.publicJs.output(res, "查询还款通道");
         if (res.resp_code == '000000') {
-          //  this.channelList=res
           if (res.result.length > 0) {
-            // this.createTask(res.result[0])
             this.version = res.result[0].version
             this.task.version = res.result[0].version
             this.$refs.verificationMethod.version = this.version
@@ -787,6 +787,7 @@ export default {
         }
       })
     },
+
     isuserable(item, type, event) {
       this.$router.push({name: type, params: {item: JSON.stringify(item)}})
     },
@@ -863,7 +864,6 @@ export default {
           date = '0' + date
         }
         for (let i = 0; i < preMonthDateLen; i++) {
-
           preMonthDateArr.unshift({ // 尾部追加
             month: 'pre', // 只是为了增加标识，区分当、下月
             date: date,
@@ -899,7 +899,6 @@ export default {
     },
     // 整合当月所有数据
     getAllArr() {
-      // alert(2)
       let preArr = this.getPreArr()
       let currentArr = this.getCurrentArr()
       let nextArr = this.getNextArr()
@@ -1370,7 +1369,7 @@ export default {
 }
 
 .calendar .content div span.activeDay {
-  background: #FF3735 !important;
+  background: #9B3C9D !important;
   color: #fff !important;
 }
 

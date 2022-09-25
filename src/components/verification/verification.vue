@@ -15,8 +15,13 @@
           验证码已发送到：{{ authorityList.result.phone | dataHidden }}请注意查收
         </div>
         <div class="verification_input van-hairline--bottom">
-          <van-field class="make_plan_input" v-model="smsCode" placeholder="请输入获取验证码" clearable type="number"
-                     maxlength="6"/>
+          <van-field
+            class="make_plan_input"
+            v-model="smsCode"
+            placeholder="请输入获取验证码"
+            clearable
+            type="number"
+            maxlength="6"/>
         </div>
         <div class="verification_btn theme-linear-bg" @click="confirm()" v-if="noconfirm">
           确定验证码
@@ -50,7 +55,8 @@ export default {
     type: {
       type: String,
       default: ''
-    }
+    },
+
   },
   data() {
     return {
@@ -93,7 +99,7 @@ export default {
           userName: this.authorityList.result.userName,
           smsCode: this.smsCode,
           orderNo: this.orderCode
-        })
+        }),
       }).then(response => {
         this.loadingTrueFalseBy = false
         if (response.resp_code == '000000') {

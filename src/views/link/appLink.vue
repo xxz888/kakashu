@@ -1,17 +1,23 @@
 <template>
   <div class="">
     <van-nav-bar :title="title" left-arrow @click-left="onClickLeft" @click-right="onClickRight">
-      <template #right v-if="type==1">
+      <!-- <template #right >
         <van-icon name="weapp-nav" size="18"/>
-      </template>
+      </template> -->
     </van-nav-bar>
+        
+
     <div
       style="width:100%;height:100%;-webkit-overflow-scrolling:touch;overflow-y:scroll;position:fixed;padding-top: 46px;">
       <iframe width="100%" height="100%" v-if="html" frameborder="0" :src="url"></iframe>
       <img v-else :src="url" class="img" alt="">
     </div>
-    <van-dialog v-model="copyTrueFalseBy" :title="html?'链接地址':'图片'" show-cancel-button
-                :confirmButtonText="html?'复制':'保存图片'" @confirm="html?copyShaneUrl(url):saveImage(url)">
+    <van-dialog
+      v-model="copyTrueFalseBy"
+      :title="html?'链接地址':'图片'"
+      show-cancel-button
+      :confirmButtonText="html?'复制':'保存图片'"
+      @confirm="html?copyShaneUrl(url):saveImage(url)">
       <div class="header">
         <div v-if="html">{{ url }}</div>
         <img v-else class="saveimg" :src="url" alt="">
@@ -37,19 +43,28 @@ export default {
     [NavBar.name]: NavBar,
     [Icon.name]: Icon,
     [Dialog.Component.name]: Dialog.Component,
-
   },
   created() {
-    this.url = JSON.parse(this.$route.params.url)
-    this.title = JSON.parse(this.$route.params.title)
-    this.type = JSON.parse(this.$route.params.type)
+    this.url = JSON.parse(this.$route.params.url);
 
+    if (this.$route.params.title) {
+          this.title = this.$route.params.title
+
+    }
+    if (this.type && this.type != 0) {
+          this.type = JSON.parse(this.$route.params.type)
+
+    }
     if (this.url.substring(8, 24) == 'mp.weixin.qq.com') {
       location.href = this.url
     }
     if (this.url.split('.png').length > 1 || this.url.split('.jpg').length > 1 || this.url.split('.jpeg').length > 1) {
       this.html = false
     }
+    
+    // if (this.type == 100) {
+    //   location.href = this.url;
+    // }
   },
   methods: {
     onClickLeft() {
@@ -95,7 +110,7 @@ export default {
   }
 }
 </script>
-<!-- Add "scoped" attribute to limit CSS to this component only -->
+
 <style scoped>
 .img {
   max-width: 100%;

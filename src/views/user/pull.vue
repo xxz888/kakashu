@@ -7,7 +7,6 @@
           <tr>
             <td class="tratitle">第一章 总则</td>
           </tr>
-          <!--<tr style="height:3px;"></tr>-->
           <tr>
             <td>
               &nbsp;&nbsp;&nbsp;&nbsp;{{ brand_name }}软件用户服务协议（以下简称本协议）双方为{{ brand_name }}与使用{{ brand_name }}软件的用户（以下简称“用户”）。本协议用于规范双方之间全部的法律关系及权利义务，具有合同效力。{{ brand_name }}软件旨在利用移动网络所具有的便利性，为广大用户提供自助式的银行卡账户查询、公共事业缴费等服务。为明确双方的权利和义务，规范双方业务行为，甲方（用户）、乙方（{{ brand_name }}）本着平等互利的原则，就使用{{ brand_name }}软件的相关事宜达成本协议。
@@ -331,7 +330,9 @@ export default {
   methods: {
     onClickLeft() {
       window.history.back()
-    }
+      return
+      this.$router.push({name: 'register'})
+    },
   }
 };
 </script>

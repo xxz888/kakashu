@@ -1,7 +1,6 @@
 <template>
   <div>
     <div class="china">
-      <!-- <h4>卡德国际</h4> -->
       <img src="../../assets/word.png">
       <div class="region-list active postition-6 online-node">
         <div class="area-box"><span class="dot"></span><span class="pulse delay-06"></span>

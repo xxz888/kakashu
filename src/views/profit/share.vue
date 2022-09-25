@@ -1,7 +1,8 @@
 <template>
   <div>
     <van-nav-bar class="agent_nav theme_bg" style="background: none;" :border='false' title="推广收益" left-arrow
-                 @click-left="onClickLeft" />
+                 @click-left="onClickLeft">
+    </van-nav-bar>
     <div class="warpper_top"></div>
     <van-pull-refresh v-model="isLoading" @refresh="onRefresh" loading-text="加载中...">
       <div>
@@ -80,6 +81,7 @@ import {NavBar, PullRefresh, Icon} from 'vant';
 import {newsQuery} from '@/api/showBrand'
 import {userShareProfitQuery, active} from "@/api/profit";
 import {toFixed} from '@/common/filters/filters'
+import { getTurnoverTotal, getTotalCurrent,getStatistics } from "@/api/user";
 
 export default {
   data() {
@@ -142,11 +144,172 @@ export default {
     }
   },
   created() {
-    this._newsQuery()
-    this._userShareProfitQuery()
+    // this._newsQuery()
+    // this._userShareProfitQuery()
     this.getActiveConfig()
+    this._getTotalCurrent();
+    this._getStatistics();
   },
   methods: {
+    _getStatistics(){
+      getStatistics().then((res) => {
+        
+        if (res.resp_code == "000000") {
+           this.profit.totalRegister = res.result.firstCount +   res.result.secondCount +  res.result.thirdCount;
+           this.profit.totalRealName = res.result.firstRealnameCount +   res.result.secondRealnameCount +  res.result.thirdRealnameCount;
+           this.profit.direct1ActiveCount = res.result.firstActivationCount ;
+           this.profit.direct2ActiveCount = res.result.secondActivationCount;
+           this.profit.direct3ActiveCount = res.result.thirdActivationCount ;
+
+        }
+        
+        })
+    },
+      _getTotalCurrent() {
+      var that = this;
+      var dic = {
+        types: ["51", "52", "53","61", "62", "63",],
+      };
+      getTotalCurrent(dic).then((res) => {
+        if (res.resp_code == "000000") {
+            var monthProfitTotal51 = 0;
+            var monthProfitTotal52 = 0;
+            var monthProfitTotal53 = 0;
+            var monthProfitTotal61 = 0;
+            var monthProfitTotal62 = 0;
+            var monthProfitTotal63 = 0;
+
+
+            var todayProfitTotal51 = 0;
+            var todayProfitTotal52 = 0;
+            var todayProfitTotal53 = 0;
+            var todayProfitTotal61 = 0;
+            var todayProfitTotal62 = 0;
+            var todayProfitTotal63 = 0;
+
+            var totayCount51 = 0;
+            var totayCount52 = 0;
+            var totayCount53 = 0;
+            var totayCount61 = 0;
+            var totayCount62 = 0;
+            var totayCount63 = 0;
+
+            var monthCount51 = 0;
+            var monthCount52 = 0;
+            var monthCount53 = 0;
+            var monthCount61 = 0;
+            var monthCount62 = 0;
+            var monthCount63 = 0;
+
+
+           if (res.result.T51 && res.result.T51.totayCount) {
+              totayCount51 = res.result.T51.totayCount;
+            }
+            if (res.result.T52 && res.result.T52.totayCount) {
+              totayCount52 = res.result.T52.totayCount;
+            }
+            if (res.result.T53 && res.result.T53.totayCount) {
+              totayCount53 = res.result.T53.totayCount;
+            }
+
+            if (res.result.T61 && res.result.T61.totayCount) {
+              totayCount61 = res.result.T61.totayCount;
+            }            
+            if (res.result.T62 && res.result.T62.totayCount) {
+              totayCount62 = res.result.T62.totayCount;
+            }
+            if (res.result.T63 && res.result.T63.totayCount) {
+              totayCount63 = res.result.T63.totayCount;
+            }
+
+
+            if (res.result.T51 && res.result.T51.monthCount) {
+              monthCount51 = res.result.T51.monthCount;
+            }
+            if (res.result.T52 && res.result.T52.monthCount) {
+              monthCount52 = res.result.T52.monthCount;
+            }
+            if (res.result.T53 && res.result.T53.monthCount) {
+              monthCount53 = res.result.T53.monthCount;
+            }
+
+            if (res.result.T61 && res.result.T61.monthCount) {
+              monthCount61 = res.result.T61.monthCount;
+            }            
+            if (res.result.T62 && res.result.T62.monthCount) {
+              monthCount62 = res.result.T62.monthCount;
+            }
+            if (res.result.T63 && res.result.T63.monthCount) {
+              monthCount63 = res.result.T63.monthCount;
+            }
+
+
+
+
+
+            if (res.result.T51 && res.result.T51.todayProfitTotal) {
+              todayProfitTotal51 = res.result.T51.todayProfitTotal;
+            }
+            if (res.result.T51 && res.result.T51.monthProfitTotal) {
+              monthProfitTotal51 = res.result.T51.monthProfitTotal;
+            }
+  
+            
+            
+            if (res.result.T52 && res.result.T52.todayProfitTotal) {
+              todayProfitTotal52 = res.result.T52.todayProfitTotal;
+            }
+            if (res.result.T52 && res.result.T52.monthProfitTotal) {
+              monthProfitTotal52 = res.result.T52.monthProfitTotal;
+            }   
+
+            if (res.result.T53 && res.result.T53.todayProfitTotal) {
+              todayProfitTotal53 = res.result.T53.todayProfitTotal;
+            }
+            if (res.result.T53 && res.result.T53.monthProfitTotal) {
+              monthProfitTotal53 = res.result.T53.monthProfitTotal;
+            }   
+
+           if (res.result.T61 && res.result.T61.todayProfitTotal) {
+              todayProfitTotal61 = res.result.T61.todayProfitTotal;
+            }
+            if (res.result.T61 && res.result.T61.monthProfitTotal) {
+              monthProfitTotal61 = res.result.T61.monthProfitTotal;
+            }   
+            
+            
+            if (res.result.T62 && res.result.T62.todayProfitTotal) {
+              todayProfitTotal62 = res.result.T62.todayProfitTotal;
+            }
+            if (res.result.T62 && res.result.T62.monthProfitTotal) {
+              monthProfitTotal62 = res.result.T62.monthProfitTotal;
+            }   
+
+
+            if (res.result.T63 && res.result.T63.todayProfitTotal) {
+              todayProfitTotal63 = res.result.T63.todayProfitTotal;
+            }
+            if (res.result.T63 && res.result.T63.monthProfitTotal) {
+              monthProfitTotal63 = res.result.T63.monthProfitTotal;
+            }   
+
+            //当日收益
+            this.profit.todayRebate = todayProfitTotal51 + todayProfitTotal52 + todayProfitTotal53 + todayProfitTotal61 + todayProfitTotal62 + todayProfitTotal63;
+            //当月收益
+            this.profit.monthRebate = monthProfitTotal51 + monthProfitTotal52 + monthProfitTotal53 + monthProfitTotal61 + monthProfitTotal62 + monthProfitTotal63;
+            //推广总收益
+            this.profit.totalRebate =  this.profit.todayRebate + this.profit.monthRebate;
+            //当日认证人数
+            this.profit.todayAuth = totayCount51 + totayCount52 + totayCount53;
+            //当日激活人数
+            this.profit.todayActive = totayCount61 + totayCount62 + totayCount63;
+             //当月认证人数
+            this.profit.monthAuth = monthCount51 + monthCount52 + monthCount53;
+            //当月激活人数
+            this.profit.monthActive = monthCount61 + monthCount62 + monthCount63;
+       }
+      });
+    },
     getActiveConfig() {
       active().then(res => {
         if (res.resp_code == "000000") {
@@ -155,10 +318,26 @@ export default {
             else if (config.level == 2) this.activeConfig[1].push({maxNum: config.maxNum, amount: config.amount})
             else this.activeConfig[2].push({maxNum: config.maxNum, amount: config.amount})
           })
-          this.activeConfig[0].sort((a, b) => a.maxNum < b.maxNum)
-          this.activeConfig[1].sort((a, b) => a.maxNum < b.maxNum)
-          this.activeConfig[2].sort((a, b) => a.maxNum < b.maxNum)
-          res.verify.sort((a, b) => a.level < b.level)
+          for (let i = 0; i < 3; ++i) {
+            for (let j = 0; j < this.activeConfig[i].length - 1; ++j) {
+              for (let k = j + 1; k < this.activeConfig[i].length; ++k) {
+                if (this.activeConfig[i][j].maxNum > this.activeConfig[i][k].maxNum) {
+                  let config = this.activeConfig[i][j]
+                  this.activeConfig[i][j] = this.activeConfig[i][k]
+                  this.activeConfig[i][k] = config
+                }
+              }
+            }
+          }
+          for (let i = 0; i < res.verify.length - 1; ++i) {
+            for (let j = i + 1; j < res.verify.length; ++j) {
+              if (res.verify[i].level > res.verify[j].level) {
+                let ver = res.verify[i]
+                res.verify[i] = res.verify[j]
+                res.verify[j] = ver
+              }
+            }
+          }
           res.verify.forEach(config => {
             this.verifyConfig.push(config.amount)
           })
@@ -186,7 +365,8 @@ export default {
       if (type == 8) {
         this.$router.push({path: path});
       } else if (type == 1) {
-        this.$router.push({path: path,
+        this.$router.push({
+          path: path,
           query: {
             'phone': this.phone,
             'token': this.token,
@@ -203,12 +383,9 @@ export default {
     onRefresh() {
       setTimeout(() => {
         this.$toast('刷新成功');
-        // this._userQuotaQuery()
         this.isLoading = false;
       }, 1000);
-    },
-
-
+    }
   }
 };
 

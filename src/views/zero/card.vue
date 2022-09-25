@@ -20,8 +20,9 @@
               <van-row type="flex" class="card_item_top" justify="space-between">
                 <van-col span="3">
                   <div class="card_icon_box">
-                    <img class="card_icon" alt="银行logo"
-                         :src="require('../../assets/bankIcon/BANK_'+item.logimg+'.png')">
+                    <img class="card_icon"
+                         :src="require('../../assets/bankIcon/BANK_'+item.logimg+'.png')"
+                         alt="银行logo">
                   </div>
                 </van-col>
                 <van-col span="15">
@@ -78,7 +79,7 @@
                 </div>
                 <span class="plan_status  two">计划详情</span>
                 <z-circle class="circle_box"
-                          :percentage="Math.ceil((item.successAmount/item.allAmount)*100)" />
+                          :percentage="Math.ceil((item.successAmount/item.allAmount)*100)"/>
               </van-col>
             </van-row>
 
@@ -93,7 +94,7 @@
               </van-col>
             </van-row>
           </div>
-          <nocard v-if="cardList.length==0" />
+          <nocard v-if="cardList.length==0"></nocard>
         </div>
       </van-pull-refresh>
       <div class="add_btn theme-linear-bg" @click="addCard()">
@@ -113,7 +114,6 @@ import {creditcardPlanListTwo} from "@/api/plan/plan";
 import nocard from "@/components/nodata/nodata";
 import ZCircle from "@/components/circle/circle";
 import {checkOrder} from "@/api/zero";
-
 
 export default {
   data() {
@@ -173,17 +173,13 @@ export default {
     nocard,
     ZCircle,
     [Popup.name]: Popup,
-    // verification
   },
-  computed: {},
   created() {
     window.getcard = this.getcard
     this.getcard()
-    var url = window.location.href;
     this.getbankIcon();
     this.getNowFormatDate();
     this.mGetDate(this.year, this.month);
-
     this.getnextmonth(Number(this.timeDay - this.day) + 1);
     this.getuppermonth(Number(-this.day));
     this.getcard()
@@ -344,11 +340,11 @@ export default {
               }
             }
             this.$nextTick(() => {
-              this.cardList.push(item)
-            })
-          })
+              this.cardList.push(item);
+            });
+          });
         }
-      })
+      });
       this.getNews()
     },
     getDebitCard() {
@@ -368,10 +364,10 @@ export default {
             }
             this.$nextTick(() => {
               this.cardList.push(item);
-            })
-          })
+            });
+          });
         }
-      })
+      });
     },
     goDetail() {
       this.$router.push({
@@ -387,12 +383,12 @@ export default {
           'billtype': "3"
         }
       });
-
     },
     detail(item) {
       //跳转详情页
       this.$store.commit('Loading')
       checkOrder(item.hasWaitingEmptyOrder).then(res => {
+        this.publicJs.output(res, "接口");
         this.$store.commit('closeLoading')
         if (res.resp_code == '000000') {
           this.$router.push({
@@ -402,7 +398,6 @@ export default {
         }
       })
     },
-
     isuserable(item, type, event) {
       event.cancelBubble = true;
       if (item.repaymentDay == 0 || item.billDay == 0) {
@@ -455,8 +450,8 @@ export default {
               this.getDebitCard();
             }
           }
-        })
-      })
+        });
+      });
     },
     defaults(item) {
       cardDefault(this.token, item.cardNo).then(res => {
@@ -468,17 +463,15 @@ export default {
             this.getDebitCard();
           }
         }
-      })
+      });
     },
     getNews() {
       newsQuery(this.global.brandId, '功能跳转').then(res => {
         if (res.resp_code == '000000') {
           this.fuwuList = res.result.content
-
         }
       })
     },
-
     help() {
       let num = 0
       this.fuwuList.map((key) => {
@@ -504,8 +497,6 @@ export default {
         })
       }
     },
-
-
     toTishi() {
       this.$toast("您有空卡任务待审核，无法重复提交！");
     },

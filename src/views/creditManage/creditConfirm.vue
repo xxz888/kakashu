@@ -53,9 +53,8 @@ export default {
       title: "确认授信",
       num: 60,
       message: '发送验证码',
-      amount: 0,
-
-    };
+      amount: 0
+    }
   },
   components: {
     [NavBar.name]: NavBar,
@@ -79,7 +78,7 @@ export default {
         if (res.resp_code == "000000") {
           this.amount = res.result.selfQuota
         }
-      });
+      })
     },
     time() {
       let timer = setInterval(() => {
@@ -130,8 +129,7 @@ export default {
       })
     }
   }
-};
-
+}
 </script>
 <style scoped>
 .credit_confirm_cont {

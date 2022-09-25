@@ -1,7 +1,7 @@
 <template>
   <div class="loading">
     <van-loading class="loading_icon" color="#FFC400"/>
-    <span class="loading_title" style="color:#4CC566">正在加载<span class="dot"></span></span>
+    <span class="loading_title theme_color ">加载中<span class="dot"></span></span>
   </div>
 </template>
 

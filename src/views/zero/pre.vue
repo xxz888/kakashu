@@ -7,9 +7,8 @@
       <div class="pre_cont">
         <img class="user_icon" src="../../assets/zero/user_icon.png"
              alt="">
-        <div class="title" v-if="prepreUserPhone!='' &&  prepreUserPhone!=null">直接推荐人：{{
-            prepreUserPhone |dataHidden
-          }}
+        <div class="title" v-if="prepreUserPhone!='' &&  prepreUserPhone!=null">
+          直接推荐人：{{ prepreUserPhone |dataHidden }}
         </div>
         <div class="title" v-else>直接推荐人：暂无</div>
         <div class="phone" v-if="prepreUserPhone!='' &&  prepreUserPhone!=null">
@@ -19,15 +18,11 @@
           </a>
         </div>
         <div class="tips">
-          直接推荐人是使用八色生活的直接推荐人，他可以为您提供八色生活功能使用说明，推广引导等服务，让您可以快速学会八色生活的使用，并在您有推广意向时，能够引导您快速获利。
+          直接推荐人是使用咔咔鼠的直接推荐人，他可以为您提供咔咔鼠功能使用说明，推广引导等服务。
         </div>
       </div>
       <div class="pre_bg_b"></div>
-      <!-- <a  v-if="prepreUserPhone!='' &&  prepreUserPhone!=null" :href="'tel:'+prepreUserPhone" class="user_right">
-        <div  :class="brandId==468?'axb_supper':'supper'"  >联系上级</div>
-      </a> -->
     </div>
-
   </div>
 </template>
 
@@ -40,9 +35,8 @@ export default {
     return {
       brandId: localStorage.getItem('brandId'),
       phone: localStorage.getItem('phone'),
-      prepreUserPhone: "",
-
-    };
+      prepreUserPhone: "13336816566"
+    }
   },
   components: {
     [NavBar.name]: NavBar,
@@ -50,7 +44,6 @@ export default {
     [Col.name]: Col,
     [Icon.name]: Icon,
   },
-  computed: {},
   created() {
     this._preUserQuery()
   },
@@ -63,7 +56,7 @@ export default {
         if (res.resp_code == "000000") {
           this.prepreUserPhone = res.result.preUserPhone
         }
-      });
+      })
     },
     goList(item, event) {
       event.cancelBubble = true;
@@ -93,6 +86,7 @@ export default {
   background: url("../../assets/zero/pre_bg_b.png") center no-repeat;
   background-size: 100% 100%;
 }
+
 .pre_cont {
   width: 95%;
   padding: 10px 15px;

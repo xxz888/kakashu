@@ -1,6 +1,6 @@
 <template>
   <div>
-    <van-nav-bar left-arrow class="agent_nav theme_bg" title="提现" @click-left="onClickLeft"/>
+    <van-nav-bar left-arrow class="agent_nav theme_bg" title="提现" @click-left="onClickLeft"></van-nav-bar>
     <div class="box">
       <div class="tis_img">
         <span v-for=" index in normal" :key="index">

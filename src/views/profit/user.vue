@@ -1,7 +1,8 @@
 <template>
   <div>
     <van-nav-bar class="agent_nav theme_bg" style="background: none;" :border='false' :title="title" left-arrow
-                 @click-left="onClickLeft" />
+                 @click-left="onClickLeft">
+    </van-nav-bar>
     <div class="warpper_top"></div>
     <van-sticky :offset-top="46">
       <div class="profit_user_search">
@@ -20,7 +21,7 @@
     </van-sticky>
     <van-pull-refresh v-model="isLoading" @refresh="onRefresh" loading-text="加载中...">
       <div>
-        <van-list v-model="isupLoading" :finished="finished" finished-text="" @load="onLoad">
+        <van-list v-model="isupLoading" :finished="finished" finished-text="没有更多了" @load="onLoad">
           <ul class="profit_user_list" v-if="sonList.length>0">
             <li class="profit_user_item_box" v-for="(item,index) in sonList" :key="index">
               <div class="profit_user_item">
@@ -28,21 +29,18 @@
                   <img src="../../assets/agent/img_icon.png" alt="">
                 </div>
                 <div class="cont">
-                  <div class="title" v-if="item.realName==null">
-                    未实名
-                    <span :class="'userStatus_'+userStatusC(item)">{{ userStatus(item) }}</span>
-                  </div>
-                  <div class="title" v-else>
-                    {{ item.realName }}
-                    <span :class="'userStatus_'+userStatusC(item)">{{ userStatus(item) }}</span>
-                  </div>
+                  <div class="title" v-if="item.realName==null">未实名 <span
+                    :class="'userStatus_'+userStatusC(item)"> {{ userStatus(item) }}</span></div>
+                  <div class="title" v-else>{{ item.realName }} <span
+                    :class="'userStatus_'+userStatusC(item)">{{ userStatus(item) }}</span></div>
                   <span class="tips">ID:{{ item.userId }}</span>
                 </div>
                 <div class="right">
                   <div class="phone">
                     <span>{{ item.phone |dataHidden }}</span>
                     <a v-if="title=='直推用户'" :href="'tel:'+item.phone">
-                      <img src="../../assets/profit/phone_icon.png" alt="">
+                      <img src="../../assets/profit/phone_icon.png"
+                           alt="">
                     </a>
                   </div>
                   <span class="tips">注册时间：{{ item.createTime }}</span>
@@ -60,8 +58,9 @@
               </div>
             </li>
           </ul>
-          <van-empty  v-else description="还没有直推用户请前去立即推广哦"
-                    >
+          <van-empty class="user_empty" v-else
+                                              :image="require('../../assets/user_empty.png')" description="还没有直推用户
+            请前去立即推广哦">
             <van-button round @click="next('/sharePage','8')" class="bottom-button theme-linear-bg color_fff ">
               立即推广
             </van-button>
@@ -135,6 +134,7 @@ export default {
     [Popup.name]: Popup,
     [Button.name]: Button
   },
+  computed: {},
   created() {
     this.title = JSON.parse(this.$route.params.title)
     this.level = JSON.parse(this.$route.params.level)
@@ -164,6 +164,7 @@ export default {
     },
     _userDirectQuery() {
       userDirectQuery(this.level, this.status, this.condition, this.size).then(res => {
+        this.publicJs.output(res, "查询用户下级信息");
         this.sonList = [];
         if (res.resp_code == "000000") {
           if (res.result.length > 0) {
@@ -256,7 +257,8 @@ export default {
       this._userDirectQuery()
     }
   }
-}
+};
+
 </script>
 <style scoped>
 .agent_nav >>> .van-nav-bar__title.van-ellipsis {
@@ -309,7 +311,7 @@ export default {
 .userStatus_0, .userStatus_2, .userStatus_4 {
   border: 1px solid #ffaf78;
   background: #ffefdd;
-  color: #4cc566;
+  color: #9B3C9D;
 }
 
 .profit_user_item .right {
@@ -399,7 +401,7 @@ export default {
 
 .agent_grade_name {
   display: inline-block;
-  background: #4cc566;
+  background: #9B3C9D;
   border-radius: 9px;
   padding: 0 8px;
   font-size: 11px;
@@ -442,7 +444,7 @@ export default {
 }
 
 .activeStatus {
-  background: #4cc566;
+  background: #9B3C9D;
   color: #fff;
 }
 </style>

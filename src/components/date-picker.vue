@@ -5,8 +5,8 @@
       <li v-for="(item, index) in calendarTitleArr" :key="index" class="week-item">{{item}}</li>
     </ul>
     <ul class="calendar-view clear">
-      <li v-for="(item, index) in visibleCalendar()" :key="index" class="date-view"
-        :class="[ {'month-class': !isCurrentMonth(item.date)},{todayBg: isCurrentDay(item.date)},{handleDay: item.clickDay}]"
+      <li v-for="(item, index) in visibleCalendar" :key="index" class="date-view"
+        :class="[ {'month-class': !isCurrentMonth(item.date)}, {todayBg: isCurrentDay(item.date)},{handleDay: item.clickDay} ]"
         @click="handleClickDay(item)">
         <span class="date-day" :style="dayStyle" :class="[{'opacity-class': !isCurrentMonth(item.date)}]">
           {{item.day}}
@@ -55,12 +55,36 @@
       }
     },
     computed : {
-      dayStyle : () => {
+      dayStyle() {
         return {
           textAlign: this.options.viewStyle.day,
         }
       },
-
+      visibleCalendar () {
+        let calendatArr = [];
+        let {year, month, day} = utils.getNewDate(utils.getDate(this.time.year, this.time.month, 1));
+        let currentFirstDay = utils.getDate(year, month, 1);
+        // 获取当前月第一天星期几
+        let weekDay = currentFirstDay.getDay();
+        let startTime = currentFirstDay - (weekDay - 1) * 24 * 60 * 60 * 1000;
+        let monthDayNum;
+        if (weekDay == 5 || weekDay == 6){
+          monthDayNum = 42
+        }else {
+          monthDayNum = 35
+        };
+        for (let i = 0; i < monthDayNum; i++) {
+          calendatArr.push({
+            date: new Date(startTime + i * 24 * 60 * 60 * 1000),
+            year: year,
+            month: month + 1,
+            day: new Date(startTime + i * 24 * 60 * 60 * 1000).getDate(),
+            clickDay: false,
+          })
+        };
+        this.headOptions.date = `${utils.englishMonth(month)} ${year}`;
+        return calendatArr
+      }
     },
     methods: {
       // 是否是当前月
@@ -105,41 +129,11 @@
           x.clickDay = false;
         });
         this.$set(item, 'clickDay', true);
-      },
-      visibleCalendar () {
-        let calendatArr = [];
-        let {year, month, day} = utils.getNewDate(utils.getDate(this.time.year, this.time.month, 1));
-
-        let currentFirstDay = utils.getDate(year, month, 1);
-
-        // 获取当前月第一天星期几
-        let weekDay = currentFirstDay.getDay();
-        let startTime = currentFirstDay - (weekDay - 1) * 24 * 60 * 60 * 1000;
-
-        let monthDayNum;
-        if (weekDay == 5 || weekDay == 6){
-          monthDayNum = 42
-        }else {
-          monthDayNum = 35
-        };
-
-        for (let i = 0; i < monthDayNum; i++) {
-          calendatArr.push({
-            date: new Date(startTime + i * 24 * 60 * 60 * 1000),
-            year: year,
-            month: month + 1,
-            day: new Date(startTime + i * 24 * 60 * 60 * 1000).getDate(),
-            clickDay: false,
-          })
-        };
-
-        this.headOptions.date = `${utils.englishMonth(month)} ${year}`;
-        return calendatArr
       }
     },
     created () {
-      this.calendarList = this.visibleCalendar()
-      this.calendarType = this.options.calendarType
+      this.calendarList = this.visibleCalendar;
+      this.calendarType = this.options.calendarType;
     }
   }
 </script>

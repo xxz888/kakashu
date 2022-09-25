@@ -3,12 +3,12 @@
   <div>
     <van-nav-bar title="消息中心" left-arrow fixed :border='false' @click-left="onClickLeft"/>
     <div class="tabs">
-      <van-tabs v-model="active" color="#FB933F" line-width="50%" line-height="2px" @change="tab">
+      <van-tabs v-model="active" color="#9B3C9D"  title-active-color='#9B3C9D'	 line-width="20%" line-height="1px" @change="tab">
         <van-tab title="个人消息"></van-tab>
         <van-tab title="平台消息"></van-tab>
       </van-tabs>
     </div>
-    <van-list v-model="loading" :finished="finished" finished-text="" @load="onLoad">
+    <van-list v-model="loading" :finished="finished" finished-text="没有更多了" @load="onLoad">
       <div class="list">
         <div class="item" v-for="(item,i) in list" :key="i">
           <h6>{{ item.title }}</h6>
@@ -50,7 +50,6 @@ export default {
   },
   created() {
     this.token = localStorage.getItem('token')
-    // this.getBrandPush()
     this.getUserPush()
   },
   methods: {
@@ -94,28 +93,26 @@ export default {
     },
     // 获取平台消息
     getBrandPush() {
-      getBrandNews(this.token, this.sizebrand)
-        .then(res => {
-          if (res.resp_code == "000000") {
-            this.list = res.result.content
-            this.totalElementsBrand = res.result.totalElements
-          } else {
-            this.$toast({message: res.resp_message, position: 'bottom'})
-          }
-        })
+      getBrandNews(this.token, this.sizebrand).then(res => {
+        if (res.resp_code == "000000") {
+          this.list = res.result.content
+          this.totalElementsBrand = res.result.totalElements
+        } else {
+          this.$toast({message: res.resp_message, position: 'bottom'})
+        }
+      })
     },
 
     // 获取个人消息
     getUserPush() {
-      userJpushHistory(this.token, this.size)
-        .then(res => {
-          if (res.resp_code == "000000") {
-            this.list = res.result.content
-            this.totalElements = res.result.totalElements
-          } else {
-            this.$toast({message: res.resp_message, position: 'bottom'})
-          }
-        })
+      userJpushHistory(this.token, this.size).then(res => {
+        if (res.resp_code == "000000") {
+          this.list = res.result.content
+          this.totalElements = res.result.totalElements
+        } else {
+          this.$toast({message: res.resp_message, position: 'bottom'})
+        }
+      })
     },
     // 跳转消息详情
     gonext(item) {
@@ -123,7 +120,6 @@ export default {
     }
   }
 }
-
 </script>
 <style scoped>
 .tabs {

@@ -2,12 +2,12 @@
   <div>
     <van-nav-bar :title="title" left-arrow @click-left="onClickLeft"></van-nav-bar>
     <div class="warpper">
-      <van-tabs v-model="active" animated title-active-color="#4cc566" background="none" sticky line-width="22px"
+      <van-tabs v-model="active" animated title-active-color="#9B3C9D" background="none" sticky line-width="22px"
                 @change="tabSwitch">
         <van-tab title="信用卡">
           <van-pull-refresh v-model="isLoading" @refresh="onRefresh" :head-height="45">
             <div class="my_card_box">
-              <div v-for="(item,index) in cardList" :key="index">
+              <div  v-for="(item,index) in cardList" :key="index">
                 <div class="my_card_item" v-if="active==0 && item.nature.indexOf('贷')>=0" @click="selCard($event,item)">
                   <div class="my_my_card_item_top ">
                     <van-row type="flex" justify="space-between">
@@ -31,7 +31,7 @@
                       <van-col span="15">
                         <div class=" ">{{ item.cardType }}</div>
                       </van-col>
-                      <van-col span="9" class="my_card_right">
+                      <van-col span="9" class="my_card_right" v-if="item.allAmount==0">
                         <div class="my_card_bank_edit ">
                           <div @click="isuserable(item,'updateCard',$event)">
                             <van-icon name="edit" class="card_arrow_icon "/>
@@ -59,8 +59,7 @@
           <van-pull-refresh v-model="isLoading" @refresh="onRefresh" :head-height="98">
             <div class="my_card_box">
               <div v-for="(item,index) in cardList" :key="index">
-                <div class="my_card_item" v-if="active==1 && item.nature.indexOf('借')>=0"
-                     @click="selCard($event,item)">
+                <div class="my_card_item" v-if="active==1 && item.nature.indexOf('借')>=0" @click="selCard($event,item)">
                   <div class="my_my_card_item_top ">
                     <van-row type="flex" justify="space-between">
                       <van-col span="4">
@@ -132,7 +131,6 @@ export default {
       count: 0,
       user_id: localStorage.getItem('userId'),
       token: localStorage.getItem('token'),
-
       cardList: [],
       currentdate: "",//当天日期
       year: "",
@@ -145,7 +143,8 @@ export default {
       type: "",
       title: "我的银行卡",
       cardType: 0,
-      txt: ''
+      txt: '',
+      
     };
   },
   components: {
@@ -160,6 +159,7 @@ export default {
     [Button.name]: Button,
     nocard
   },
+  computed: {},
   created() {
     this.title = JSON.parse(this.$route.params.title)
     this.cardType = JSON.parse(this.$route.params.type)
@@ -175,7 +175,6 @@ export default {
     onClickLeft() {
       history.go(-1)
     },
-
     tabSwitch(name, titile) {
       this.active = name
       if (name == 0) {
@@ -190,7 +189,6 @@ export default {
       } else {
         this.$router.push({name: "depositCardAdd"});
       }
-
     },
     getbankIcon() {
       bankIconQuery().then(icon => {
@@ -202,21 +200,22 @@ export default {
     getcard() {
       //查询信用卡
       cardQuery(this.user_id).then(res => {
+        var that = this;
         this.cardList = []
         if (res.resp_code == "000000") {
           res.result.forEach(item => {
-            for (var j = 0; j < this.bankIconList.length; j++) {
-              if (item.bankName == this.bankIconList[j].bank_name) {
-                item.logimg = this.bankIconList[j].bank_acronym;
-                item.background = this.bankIconList[j].background;
+            for (var j = 0; j < that.bankIconList.length; j++) {
+              if (item.bankName == that.bankIconList[j].bank_name) {
+                item.logimg = that.bankIconList[j].bank_acronym;
+                item.background = that.bankIconList[j].background;
                 break;
               } else {
-                item.background = "#4cc566"
+                item.background = "#9B3C9D"
                 item.logimg = "default"
               }
             }
-            this.cardList.push(item)
-          })
+            that.cardList.push(item)
+          });
         }
       })
     },
@@ -231,14 +230,14 @@ export default {
                 item.background = this.bankIconList[j].background;
                 break;
               } else {
-                item.background = "#4cc566"
+                item.background = "#9B3C9D"
                 item.logimg = "default"
               }
             }
             this.$nextTick(() => {
               this.cardList.push(item)
             })
-          })
+          });
         }
       })
     },
@@ -251,29 +250,29 @@ export default {
       }
     },
     isuserable(item, type, event) {
-      event.cancelBubble = true
+      event.cancelBubble = true;
       this.$router.push({
         name: type,
         params: {item: JSON.stringify(item), type: 3}
-      })
+      });
     },
     carddel(item, event) {
       event.cancelBubble = true;
-      //删除银行卡
       this.$dialog.confirm({
         title: '温馨提示',
         message: "确定要删除银行卡吗？",
       }).then(() => {
-        bankDel(this.token, item.cardNo, item.type).then(res => {
-          if (res.resp_code == "000000") {
-            this.$notify({type: "primary", message: res.resp_message});
-            if (this.active == 0) {
-              this.getcard()
-            } else {
-              this.getDebitCard()
+        bankDel(this.token, item.cardNo, item.type)
+          .then(res => {
+            if (res.resp_code == "000000") {
+              this.$notify({type: "primary", message: res.resp_message});
+              if (this.active == 0) {
+                this.getcard()
+              } else {
+                this.getDebitCard()
+              }
             }
-          }
-        })
+          })
       })
     },
     defaults(item, event) {

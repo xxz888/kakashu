@@ -1,8 +1,7 @@
 <template>
   <div>
     <div class="partner_cont" :class="'tu_'+name">
-      <img width="100%" :src="'../../assets/share/'+name+'.jpg'"
-           style="visibility: hidden;">
+      <img width="100%" :src="'../../assets/share/'+name+'.jpg'" style="visibility: hidden;">
     </div>
   </div>
 </template>
@@ -17,10 +16,12 @@ export default {
   created() {
     this.name = this.$route.params.name
   },
+  computed: {},
   methods: {
     onClickLeft() {
       window.history.back()
-    }
+      return
+    },
   }
 }
 

@@ -1,7 +1,7 @@
 <template>
   <div style="background: #fff;">
-    <van-nav-bar class="agent_nav theme_bg" style="background: none;" :border='false' :title="title" left-arrow
-                 @click-left="onClickLeft" />
+    <van-nav-bar class="agent_nav theme_bg" style="background: none;" :border='false' :title="title" left-arrow @click-left="onClickLeft">
+    </van-nav-bar>
     <div class="warpper_top"></div>
     <van-pull-refresh v-model="isLoading" @refresh="onRefresh" loading-text="加载中...">
       <div>
@@ -20,24 +20,22 @@
             </div>
           </div>
           <van-list v-model="isupLoading" :finished="finished" finished-text="" @load="onLoad">
-            <ul class="profit_type_date" v-if='profitDetail.length'>
+            <ul class="profit_type_date" v-if='profitDetail.length >0'>
               <li class="item van-hairline--bottom" v-for="(item,index) in profitDetail" :key="index">
-                <div class="type">{{ item.tradeTime.split('-')[1] + '/' + item.tradeTime.split('-')[2] }}</div>
-                <div>{{ item.userName }}</div>
-                <div>{{ item.tradeAmount |toFixed }}</div>
-                <div class="active">{{ item.rebate |toFixed }}</div>
+                <div class="type">{{ item.createTime }}</div>
+                <div>{{ item.sourceName }}</div>
+                <div>{{ item.orderAmount |toFixed }}</div>
+                <div class="active">{{ item.amount |toFixed }}</div>
               </li>
             </ul>
             <van-empty class="user_empty" v-else
-                       image="../../assets/profit/profit_empty.png"
-                       description="还没有获得分润,请前去立即推广哦">
+                       description="还没有获得分润 请前去立即推广哦">
               <van-button round @click="next('/sharePage','8')" class="bottom-button theme-linear-bg color_fff ">
                 立即推广
               </van-button>
             </van-empty>
           </van-list>
         </div>
-
       </div>
     </van-pull-refresh>
   </div>
@@ -57,6 +55,7 @@ import {
 import {
   userDirectDetailQuery
 } from "@/api/profit";
+import { getTurnoverUser} from "@/api/user";
 
 export default {
   data() {
@@ -94,8 +93,8 @@ export default {
         return '还款'
       } else if (this.level == 3) {
         return '空卡'
-      } else {
-        return '刷卡'
+      }else{
+        return '金额'
       }
     }
   },
@@ -105,33 +104,109 @@ export default {
     this.level = JSON.parse(this.$route.params.level)
     this.yaer = JSON.parse(this.$route.params.yaer)
     this.month = JSON.parse(this.$route.params.month)
-    this._userDirectDetailQuery()
+    // this._userDirectDetailQuery()
+    this._getTurnoverUser();
+    
+  
   },
   methods: {
+    _getTurnoverUser(){
+      var that = this;
+      var type = '';
+      if (this.level==1) {
+        type = this.queryType ;
+      }
+      if (this.level==2) {
+        type = this.queryType == 1 ? '11' : this.queryType == 2 ? '12' : this.queryType == 3 ? '13' :'14';
+      }
+      if (this.level==3) {
+        type = this.queryType == 1 ? '11' : this.queryType == 2 ? '12' : this.queryType == 3 ? '13' :'14';
+      }
+    
+      var dic = {
+           types: [type],
+           queryDate: String(this.yaer) + String(this.month),
+           page:1,
+           size:200
+      };
+      if (this.level==4) {
+        dic.types = ['71','72','73','74'];
+      }
+       if (this.level==5) {
+        dic.types = ['81','82','83','84'];
+      }
+      getTurnoverUser(dic).then(res=>{
+         if (res.resp_code == '000000') {
+           
+            if (res.result.content.length > 0) {
+              
+              that.profitDetail = res.result.content
+              that.isupLoading = false;
+              if (that.profitDetail.length == that.size) {
+                that.finished = false;
+              } else if (that.size > that.profitDetail.length) {
+                that.finished = true;
+              } else {
+                that.finished = true;
+              }
+              that.size += 10
+            } else {
+              
+              that.profitDetail = [];
+              that.finished = true
+              that.isupLoading = true;
+            }
+
+
+            for (const item of that.profitDetail) {
+              if (item.type != 71 && this.level==4) {
+                item.sourceName = this.desensitizedName(item.sourceName);
+              }
+              if (item.type != 81 && this.level==5) {
+                item.sourceName = this.desensitizedName(item.sourceName);
+              }
+
+            }
+          }
+      
+      })
+    },
+    desensitizedName (fullName) {
+        if (!fullName) {
+            return "";
+        }
+        let str = fullName.substr(0, 1);
+        for (let i = 0; i < fullName.length - 1; i++) {
+            str += '*';
+        }
+        return str;
+    },
+
     onClickLeft() {
       this.publicJs.back();
     },
     _userDirectDetailQuery() {
-      userDirectDetailQuery(String(this.yaer) + String(this.month), this.queryType, this.level, this.size).then(res => {
-        if (res.resp_code == '000000') {
-          if (res.result.length > 0) {
-            this.profitDetail = res.result
-            this.isupLoading = false;
-            if (this.profitDetail.length == this.size) {
-              this.finished = false;
-            } else if (this.size > this.profitDetail.length) {
-              this.finished = true;
+      userDirectDetailQuery(String(this.yaer) + String(this.month), this.queryType, this.level, this.size)
+        .then(res => {
+          if (res.resp_code == '000000') {
+            if (res.result.length > 0) {
+              this.profitDetail = res.result
+              this.isupLoading = false;
+              if (this.profitDetail.length == this.size) {
+                this.finished = false;
+              } else if (this.size > this.profitDetail.length) {
+                this.finished = true;
+              } else {
+                this.finished = true;
+              }
+              this.size += 10
             } else {
-              this.finished = true;
+              this.profitDetail = [];
+              this.finished = true
+              this.isupLoading = true;
             }
-            this.size += 10
-          } else {
-            this.profitDetail = [];
-            this.finished = true
-            this.isupLoading = true;
           }
-        }
-      })
+        })
     },
     next(path, type) {
       this.$router.push({path: path});
@@ -140,17 +215,17 @@ export default {
     onRefresh() {
       setTimeout(() => {
         this.$toast('刷新成功');
-        this._userDirectDetailQuery()
+        this._getTurnoverUser()
         this.isLoading = false;
       }, 1000);
     },
     onLoad() {  //上啦加载
       setTimeout(() => {
-        this._userDirectDetailQuery()
+        this._getTurnoverUser()
       }, 500);
     }
   }
-};
+}
 
 </script>
 <style scoped>
@@ -206,7 +281,7 @@ export default {
 
 .profit_type_date .item {
   display: flex;
-  line-height: 44px;
+  line-height: 24px;
   text-align: center;
 }
 
@@ -219,10 +294,11 @@ export default {
 
 .profit_type_date .item div {
   flex: 1;
+    text-align: center;
 }
 
 .active {
-  color: #F63802;
+  color: #9B3C9D;
 }
 
 .profit_type_date .type {
