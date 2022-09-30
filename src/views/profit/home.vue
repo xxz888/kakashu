@@ -82,7 +82,7 @@
       <div class="profit_home_cont_box">
         <div class="profit_home_cont">
           <ul>
-            <li class="item" @click="next('profitShare')">
+            <li class="item" @click="next('profitShare',8)">
               <img
                 class="img60"
                 src="../../assets/profit/组 17843@2x.png"
@@ -91,7 +91,7 @@
               <p class="mt-25">推广收益</p>
             </li>
 
-            <li class="item" @click="next('profitType', 2,'刷卡')">
+            <li class="item" @click="next('profitType', 1,'刷卡')">
               <img
                 class="img60"
                 src="../../assets/profit/组 17844@2x.png"
@@ -99,7 +99,7 @@
               />
               <p class="mt-25">刷卡分润</p>
             </li>
-            <li class="item" @click="next('profitType', 12,'还款')">
+            <li class="item" @click="next('profitType', 2,'还款')">
               <img
                 class="img60"
                 src="../../assets/profit/组 17845@2x.png"
@@ -116,7 +116,7 @@
               />
               <p class="mt-25">达标奖励</p>
             </li>
-            <li class="item" @click="next('/profitCashback',8,'刷卡')">
+            <li class="item" @click="next('/profitCashback',8)">
               <img
                 class="img60"
                 src="../../assets/profit/组 17847@2x.png"
